@@ -158,7 +158,130 @@ public class Evento {
         }
     }
 
+    public static int getId(int id){
+        Integer idEncontrado = null;
+        Connection con = conectarBD();
+        try {
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT id FROM evento WHERE id = "+id);
+            if (rs.next()) {
+                idEncontrado = rs.getInt(1);
+                
+            }
+
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
+        return idEncontrado;
+
+
+    }
+
+    public static ObservableList<Evento> getTxt(String txt,ObservableList<Evento> listaEventos){
+        
+        Connection con = conectarBD();
+        try {
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT nombre,descripcion FROM evento WHERE nombre LIKE '%"+txt+"%' OR descripcion LIKE '%"+txt+"%'");
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String nombre = rs.getString("nombre");
+                String descripcion = rs.getString("descripcion");
+                String lugar = rs.getString("lugar");
+                String fecha_inicio = rs.getString("fecha_inicio");
+                String fecha_fin = rs.getString("fecha_fin");
+                int id_categoria = rs.getInt("id_categoria");
+
+                Evento evento = new Evento(id, nombre, descripcion, lugar, fecha_inicio, fecha_fin, id_categoria);
+
+                listaEventos.add(evento);
+
+            } 
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
+        if (listaEventos.isEmpty()) {
+            return null;
+        }else{
+            return listaEventos;
+        }
+
+
+
+    }
+
+
+    public static int getLastId() {
+        Connection con = conectarBD();
+        int lastId = 0;
+        try {
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT MAX(id) FROM evento");
+            if (rs.next()) {
+                lastId = rs.getInt(1);
+            }
+            con.close();
+        } catch (Exception e) {
+            System.out.println("Error de SQL: " + e.getMessage());
+        }
+        return lastId;
+    }
     
+    
+    public int save() {
+        Connection con = conectarBD();
+        int filasAfectadas = 0;
+        try {
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM evento WHERE id=" + this.getId());
+            if (rs.next()) {
+                // Si el usuario ya existía, lo modificamos
+                //Statement st = con.prepareStatement("UPDATE evento SET  nombre='?', descripcion='?', lugar='?', fecha_inicio='?', fecha_fin='" + this.getFecha_fin() + "', id_categoria='" + this.getId_categoria() + "' WHERE id=" + this.getId());
+                //st.setString(1, this.getNombre());
+                //st.setString(2, this.getDescripcion());
+                filasAfectadas = st.executeUpdate("UPDATE evento SET  nombre='" + nombre + "', descripcion='" + this.getDescripcion() + "', lugar='" + this.getLugar() + "', fecha_inicio='" + this.getFecha_inicio() + "', fecha_fin='" + this.getFecha_fin() + "', id_categoria='" + this.getId_categoria() + "' WHERE id=" + this.getId());
+            } else {
+                // Si el usuario no existía, lo añadimos
+                filasAfectadas = st.executeUpdate("INSERT INTO evento VALUES (" + this.getId() + ", '" + this.getNombre() + "', '" + this.getDescripcion() + "', '" + this.getLugar() + "', '" + this.getFecha_inicio() + "', '" + this.getFecha_fin() + "', '" + this.getId_categoria() + "')");
+            }
+            con.close();
+        } catch (Exception e) {
+            System.out.println("Error de SQL: " + e.getMessage());
+        }
+        return filasAfectadas;
+    }
+
+    public int delete() {
+        Connection con = conectarBD();
+        int filasAfectadas = 0;
+        try {
+            Statement st = con.createStatement();
+            filasAfectadas = st.executeUpdate("DELETE FROM evento WHERE id=" + this.getId());
+            con.close();
+        } catch (Exception e) {
+            System.out.println("Error de SQL: " + e.getMessage());
+        }
+        return filasAfectadas;
+    }
+
+    public int getCategoria(){
+
+        Connection con = conectarBD();
+        
+        try {
+            Statement st = con.createStatement();
+           st.executeUpdate("DELETE FROM evento WHERE id=" + this.getId());
+            con.close();
+        } catch (Exception e) {
+            System.out.println("Error de SQL: " + e.getMessage());
+        }
+        return filasAfectadas;
+    }
+    }
+
+
     
     private static Connection conectarBD() {
         try {
@@ -172,3 +295,4 @@ public class Evento {
 
 
 }
+
