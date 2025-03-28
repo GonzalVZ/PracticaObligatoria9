@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="TOP_CENTER" prefHeight="535.0" prefWidth="797.0" spacing="10" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.EventoController">
+    <children>
+        <Label prefHeight="45.0" prefWidth="225.0" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Gestión de Eventos" />
+        <HBox alignment="CENTER" prefHeight="41.0" prefWidth="797.0" spacing="20">
+            <children>
+                <Button text="Agregar" />
+                <Button text="Editar" />
+                <Button text="Eliminar" />
+                <Button text="Actualizar" />
+            </children>
+        </HBox>
+        <TableView prefHeight="400.0" prefWidth="531.0">
+            <columns>
+                <TableColumn text="ID" />
+                <TableColumn text="Nombre" />
+                <TableColumn text="Descripción" />
+            </columns>
+        </TableView>
+    </children>
+</VBox>

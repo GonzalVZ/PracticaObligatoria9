@@ -267,19 +267,22 @@ public class Evento {
     }
 
     public int getCategoria(){
-
+    int id_categoriaEncontrado = 0;
         Connection con = conectarBD();
         
         try {
             Statement st = con.createStatement();
-           st.executeUpdate("DELETE FROM evento WHERE id=" + this.getId());
+            ResultSet rs =  st.executeQuery("SELECT id_categoria FROM evento WHERE id=" + this.getId());
+            if (rs.next()) {
+                id_categoriaEncontrado = rs.getInt(1);
+            }
             con.close();
         } catch (Exception e) {
             System.out.println("Error de SQL: " + e.getMessage());
         }
-        return filasAfectadas;
+        return id_categoriaEncontrado;
     }
-    }
+    
 
 
     
