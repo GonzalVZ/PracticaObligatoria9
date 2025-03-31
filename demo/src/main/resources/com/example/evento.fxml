@@ -12,17 +12,22 @@
         <Label prefHeight="45.0" prefWidth="225.0" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Gestión de Eventos" />
         <HBox alignment="CENTER" prefHeight="41.0" prefWidth="797.0" spacing="20">
             <children>
-                <Button text="Agregar" />
-                <Button text="Editar" />
-                <Button text="Eliminar" />
-                <Button text="Actualizar" />
+                <Button text="Eventos" />
+                <Button onAction="#persona" text="Persona" />
+                <Button text="Categoria" />
+                <Button text="Participante" />
+            <Button mnemonicParsing="false" text="Artista" />
             </children>
         </HBox>
-        <TableView prefHeight="400.0" prefWidth="531.0">
+        <TableView fx:id="tableView" prefHeight="400.0" prefWidth="531.0">
             <columns>
-                <TableColumn text="ID" />
-                <TableColumn text="Nombre" />
-                <TableColumn text="Descripción" />
+                <TableColumn fx:id="id" text="ID" />
+                <TableColumn fx:id="nombre" text="Nombre" />
+                <TableColumn fx:id="descripcion" text="Descripción" />
+            <TableColumn fx:id="lugar" text="Lugar" />
+            <TableColumn fx:id="fecha_inicio" text="Inicio" />
+            <TableColumn fx:id="fecha_fin" text="Fin" />
+            <TableColumn fx:id="id_categoria" text="Categoria" />
             </columns>
         </TableView>
     </children>

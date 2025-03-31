@@ -11,34 +11,28 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 
-public class Evento {
+public class Persona {
 
 
     private IntegerProperty id;
 
     private StringProperty nombre;
 
-    private StringProperty descripcion;
+    private StringProperty apellido1;
 
-    private StringProperty lugar;
+    private StringProperty apellido2;
 
-    private StringProperty fecha_inicio;
-
-    private StringProperty fecha_fin;
-
-    private IntegerProperty id_categoria;
+    
 
 
 
-    public Evento(int id,String nombre,String descripcion,String lugar,String fecha_inicio,String fecha_fin,int id_categoria){
+    public Persona(int id,String nombre,String apellido1,String apellido2){
 
         this.id = new SimpleIntegerProperty(id);
         this.nombre = new SimpleStringProperty(nombre);
-        this.descripcion = new SimpleStringProperty(descripcion);
-        this.lugar = new SimpleStringProperty(lugar);
-        this.fecha_inicio = new SimpleStringProperty(fecha_inicio);
-        this.fecha_fin = new SimpleStringProperty(fecha_fin);
-        this.id_categoria = new SimpleIntegerProperty(id_categoria);
+        this.apellido1 = new SimpleStringProperty(apellido1);
+        this.apellido2 = new SimpleStringProperty(apellido2);
+      
 
 
 
@@ -52,26 +46,15 @@ public class Evento {
         return nombre;
     }
 
-    public StringProperty descripcionProperty(){
-        return descripcion;
+    public StringProperty apellido1Property(){
+        return apellido1;
     }
 
-    public StringProperty lugarProperty(){
-        return lugar;
+    public StringProperty apellido2Property(){
+        return apellido2;
     }
 
-    public StringProperty fecha_inicioProperty(){
-        return fecha_inicio;
-    }
-
-    public StringProperty fecha_finProperty(){
-        return fecha_fin;
-    }
-
-    public IntegerProperty id_categoriaProperty(){
-        return id_categoria;
-    }
-
+   
 
 
     public int getId() {
@@ -90,50 +73,53 @@ public class Evento {
         this.nombre.set(nombre);
     }
 
-    public String getDescripcion() {
-        return descripcion.get();
+    public String getApellido1() {
+        return apellido1.get();
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion.set(descripcion);
+    public void setApellido1(String apellido1) {
+        this.apellido1.set(apellido1);
     }
 
-    public String getLugar() {
-        return lugar.get();
+    public String getApellido2() {
+        return apellido2.get();
     }
 
-    public void setLugar(String lugar) {
-        this.lugar.set(lugar);
+    public void setApellido2(String apellido2) {
+        this.apellido1.set(apellido2);
     }
 
-    public String getFecha_inicio() {
-        return fecha_inicio.get();
+    public static void getAll(ObservableList<Persona> listaPersona) {
+        String query = "SELECT * FROM persona"; // Asegúrate de que la tabla 'persona' y sus columnas existan en la base de datos
+        try (Connection con = conectarBD();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
+    
+            while (rs.next()) {
+                // Asegúrate de que los nombres de las columnas coincidan con los de tu tabla en la base de datos
+                int id = rs.getInt("id");
+                String nombre = rs.getString("nombre");
+                String apellido1 = rs.getString("apellido1");
+                String apellido2 = rs.getString("apellido2");
+                
+    
+                // Crea un nuevo objeto Persona con los datos obtenidos
+                Persona persona = new Persona(id, nombre, apellido1, apellido2);
+    
+                // Agrega el objeto Persona a la lista
+                listaPersona.add(persona);
+            }
+        } catch (Exception e) {
+            System.out.println("Error de SQL: " + e.getMessage());
+        }
     }
 
-    public void setFecha_inicio(String fecha_inicio) {
-        this.fecha_inicio.set(fecha_inicio);
-    }
-
-    public String getFecha_fin() {
-        return fecha_fin.get();
-    }
-
-    public void setFecha_fin(String fecha_fin) {
-        this.fecha_fin.set(fecha_fin);
-    }
-
-    public int getId_categoria() {
-        return id_categoria.get();
-    }
-
-    public void setId_categoria(int id_categoria) {
-        this.id_categoria.set(id_categoria);
-    }
 
 
-    public static void getAll(ObservableList<Evento> listaEventos) {
-        String query = "SELECT * FROM evento"; // Asegúrate de que la tabla 'evento' y sus columnas existan en la base de datos
-        try (Connection con = Conexion.conectarBD();
+    
+    public static void getAll(ObservableList<Persona> listaPersona) {
+        String query = "SELECT * FROM persona"; // Asegúrate de que la tabla 'evento' y sus columnas existan en la base de datos
+        try (Connection con = conectarBD();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(query)) {
     
@@ -283,6 +269,7 @@ public class Evento {
         return id_categoriaEncontrado;
     }
     
+
 
 
 

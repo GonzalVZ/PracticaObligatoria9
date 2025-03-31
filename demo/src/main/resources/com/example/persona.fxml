@@ -7,9 +7,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="535.0" prefWidth="797.0" spacing="10" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.EventoController">
+<VBox alignment="TOP_CENTER" prefHeight="535.0" prefWidth="797.0" spacing="10" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.PersonaController">
     <children>
-        <Label prefHeight="45.0" prefWidth="225.0" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Gestión de Eventos" />
+        <Label prefHeight="45.0" prefWidth="262.0" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Gestión de Personas" />
         <HBox alignment="CENTER" prefHeight="41.0" prefWidth="797.0" spacing="20">
             <children>
                 <Button text="Eventos" />
@@ -23,11 +23,8 @@
             <columns>
                 <TableColumn fx:id="id" text="ID" />
                 <TableColumn fx:id="nombre" text="Nombre" />
-                <TableColumn fx:id="descripcion" text="Descripción" />
-            <TableColumn fx:id="lugar" text="Lugar" />
-            <TableColumn fx:id="fecha_inicio" text="Inicio" />
-            <TableColumn fx:id="fecha_fin" text="Fin" />
-            <TableColumn fx:id="id_categoria" text="Categoria" />
+                <TableColumn fx:id="apellido1" prefWidth="121.0" text="Primer Apellido" />
+            <TableColumn fx:id="apellido2" prefWidth="119.0" text="Segundo Apellido" />
             </columns>
         </TableView>
     </children>
