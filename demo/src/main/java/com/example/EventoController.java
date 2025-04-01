@@ -37,8 +37,7 @@ public class EventoController {
      @FXML
      private TableColumn<Evento, String> fecha_fin;
 
-     @FXML
-     private TableColumn<Evento, Integer> id_categoria;
+     
      
 
 
@@ -48,6 +47,10 @@ public class EventoController {
      // En initialize() se inicializa el TableView y se asocia a la lista de usuarios.
      // ¡Esto solo hay que hacerlo una vez!
      public void initialize() {
+        tableView.setEditable(true);
+
+
+
          // Inicializamos las columnas de la tabla.
          id.setCellValueFactory(new PropertyValueFactory<>("id"));
          nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
@@ -55,7 +58,7 @@ public class EventoController {
          lugar.setCellValueFactory(new PropertyValueFactory<>("lugar"));
          fecha_inicio.setCellValueFactory(new PropertyValueFactory<>("fecha_inicio"));
          fecha_fin.setCellValueFactory(new PropertyValueFactory<>("fecha_fin"));
-         id_categoria.setCellValueFactory(new PropertyValueFactory<>("id_categoria"));
+        
  
          // Hacemos que las columnas nick y email sean editables (no el id)
          nombre.setCellFactory(TextFieldTableCell.forTableColumn());
