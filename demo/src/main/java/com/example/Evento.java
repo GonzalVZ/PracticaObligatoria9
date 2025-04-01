@@ -1,7 +1,6 @@
 package com.example;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -13,25 +12,15 @@ import javafx.collections.ObservableList;
 
 public class Evento {
 
-
     private IntegerProperty id;
-
     private StringProperty nombre;
-
     private StringProperty descripcion;
-
     private StringProperty lugar;
-
     private StringProperty fecha_inicio;
-
     private StringProperty fecha_fin;
-
     private IntegerProperty id_categoria;
 
-
-
-    public Evento(int id,String nombre,String descripcion,String lugar,String fecha_inicio,String fecha_fin,int id_categoria){
-
+    public Evento(int id, String nombre, String descripcion, String lugar, String fecha_inicio, String fecha_fin, int id_categoria) {
         this.id = new SimpleIntegerProperty(id);
         this.nombre = new SimpleStringProperty(nombre);
         this.descripcion = new SimpleStringProperty(descripcion);
@@ -39,40 +28,35 @@ public class Evento {
         this.fecha_inicio = new SimpleStringProperty(fecha_inicio);
         this.fecha_fin = new SimpleStringProperty(fecha_fin);
         this.id_categoria = new SimpleIntegerProperty(id_categoria);
-
-
-
     }
 
-    public IntegerProperty idProperty(){
+    public IntegerProperty idProperty() {
         return id;
     }
-    
-    public StringProperty nombreProperty(){
+
+    public StringProperty nombreProperty() {
         return nombre;
     }
 
-    public StringProperty descripcionProperty(){
+    public StringProperty descripcionProperty() {
         return descripcion;
     }
 
-    public StringProperty lugarProperty(){
+    public StringProperty lugarProperty() {
         return lugar;
     }
 
-    public StringProperty fecha_inicioProperty(){
+    public StringProperty fecha_inicioProperty() {
         return fecha_inicio;
     }
 
-    public StringProperty fecha_finProperty(){
+    public StringProperty fecha_finProperty() {
         return fecha_fin;
     }
 
-    public IntegerProperty id_categoriaProperty(){
+    public IntegerProperty id_categoriaProperty() {
         return id_categoria;
     }
-
-
 
     public int getId() {
         return id.get();
@@ -130,15 +114,13 @@ public class Evento {
         this.id_categoria.set(id_categoria);
     }
 
-
-    public static void getAll(ObservableList<Evento> listaEventos) {
-        String query = "SELECT * FROM evento"; // Asegúrate de que la tabla 'evento' y sus columnas existan en la base de datos
+    public static ObservableList<Evento> getAll(ObservableList<Evento> listaEventos) {
+        String query = "SELECT * FROM evento";
         try (Connection con = Conexion.conectarBD();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(query)) {
-    
+
             while (rs.next()) {
-                // Asegúrate de que los nombres de las columnas coincidan con los de tu tabla en la base de datos
                 int id = rs.getInt("id");
                 String nombre = rs.getString("nombre");
                 String descripcion = rs.getString("descripcion");
@@ -146,44 +128,26 @@ public class Evento {
                 String fecha_inicio = rs.getString("fecha_inicio");
                 String fecha_fin = rs.getString("fecha_fin");
                 int id_categoria = rs.getInt("id_categoria");
-    
-                // Crea un nuevo objeto Evento con los datos obtenidos
+
                 Evento evento = new Evento(id, nombre, descripcion, lugar, fecha_inicio, fecha_fin, id_categoria);
-    
-                // Agrega el objeto Evento a la lista
                 listaEventos.add(evento);
             }
         } catch (Exception e) {
             System.out.println("Error de SQL: " + e.getMessage());
         }
-    }
-
-    public static int getId(int id){
-        Integer idEncontrado = null;
-        Connection con = conectarBD();
-        try {
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT id FROM evento WHERE id = "+id);
-            if (rs.next()) {
-                idEncontrado = rs.getInt(1);
-                
-            }
-
-        } catch (Exception e) {
-            // TODO: handle exception
+        if (listaEventos.isEmpty()) {
+            return null;
         }
-
-        return idEncontrado;
-
-
+        return listaEventos;
     }
 
-    public static ObservableList<Evento> getTxt(String txt,ObservableList<Evento> listaEventos){
-        
-        Connection con = conectarBD();
+    public static ObservableList<Evento> getId(int id1, ObservableList<Evento> listaEventos) {
+        Connection con = Conexion.conectarBD();
+        Statement st = null;
+        ResultSet rs = null;
         try {
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT nombre,descripcion FROM evento WHERE nombre LIKE '%"+txt+"%' OR descripcion LIKE '%"+txt+"%'");
+            st = con.createStatement();
+            rs = st.executeQuery("SELECT * FROM evento WHERE id = " + id1);
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String nombre = rs.getString("nombre");
@@ -194,59 +158,73 @@ public class Evento {
                 int id_categoria = rs.getInt("id_categoria");
 
                 Evento evento = new Evento(id, nombre, descripcion, lugar, fecha_inicio, fecha_fin, id_categoria);
-
                 listaEventos.add(evento);
-
-            } 
+            }
         } catch (Exception e) {
-            // TODO: handle exception
-        }
+            System.err.println("Error de SQL: " + e.getMessage());
+        } 
 
         if (listaEventos.isEmpty()) {
             return null;
-        }else{
+        } else {
             return listaEventos;
         }
-
-
-
     }
 
+    public static ObservableList<Evento> getTxt(String txt, ObservableList<Evento> listaEventos) {
+        Connection con = Conexion.conectarBD();
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            st = con.createStatement();
+            rs = st.executeQuery("SELECT * FROM evento WHERE nombre LIKE '%" + txt + "%' OR descripcion LIKE '%" + txt + "%'");
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String nombre = rs.getString("nombre");
+                String descripcion = rs.getString("descripcion");
+                String lugar = rs.getString("lugar");
+                String fecha_inicio = rs.getString("fecha_inicio");
+                String fecha_fin = rs.getString("fecha_fin");
+                int id_categoria = rs.getInt("id_categoria");
+
+                Evento evento = new Evento(id, nombre, descripcion, lugar, fecha_inicio, fecha_fin, id_categoria);
+                listaEventos.add(evento);
+            }
+        } catch (Exception e) {
+            System.err.println("Error de SQL: " + e.getMessage());
+        } 
+
+        if (listaEventos.isEmpty()) {
+            return null;
+        } else {
+            return listaEventos;
+        }
+    }
 
     public static int getLastId() {
-        Connection con = conectarBD();
+        Connection con = Conexion.conectarBD();
         int lastId = 0;
-        try {
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT MAX(id) FROM evento");
+        try (Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT MAX(id) FROM evento")) {
             if (rs.next()) {
                 lastId = rs.getInt(1);
             }
-            con.close();
         } catch (Exception e) {
             System.out.println("Error de SQL: " + e.getMessage());
         }
         return lastId;
     }
-    
-    
+
     public int save() {
-        Connection con = conectarBD();
+        Connection con = Conexion.conectarBD();
         int filasAfectadas = 0;
-        try {
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM evento WHERE id=" + this.getId());
+        try (Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT * FROM evento WHERE id=" + this.getId())) {
             if (rs.next()) {
-                // Si el usuario ya existía, lo modificamos
-                //Statement st = con.prepareStatement("UPDATE evento SET  nombre='?', descripcion='?', lugar='?', fecha_inicio='?', fecha_fin='" + this.getFecha_fin() + "', id_categoria='" + this.getId_categoria() + "' WHERE id=" + this.getId());
-                //st.setString(1, this.getNombre());
-                //st.setString(2, this.getDescripcion());
                 filasAfectadas = st.executeUpdate("UPDATE evento SET  nombre='" + this.getNombre() + "', descripcion='" + this.getDescripcion() + "', lugar='" + this.getLugar() + "', fecha_inicio='" + this.getFecha_inicio() + "', fecha_fin='" + this.getFecha_fin() + "', id_categoria='" + this.getId_categoria() + "' WHERE id=" + this.getId());
             } else {
-                // Si el usuario no existía, lo añadimos
                 filasAfectadas = st.executeUpdate("INSERT INTO evento VALUES (" + this.getId() + ", '" + this.getNombre() + "', '" + this.getDescripcion() + "', '" + this.getLugar() + "', '" + this.getFecha_inicio() + "', '" + this.getFecha_fin() + "', '" + this.getId_categoria() + "')");
             }
-            con.close();
         } catch (Exception e) {
             System.out.println("Error de SQL: " + e.getMessage());
         }
@@ -254,37 +232,27 @@ public class Evento {
     }
 
     public int delete() {
-        Connection con = conectarBD();
+        Connection con = Conexion.conectarBD();
         int filasAfectadas = 0;
-        try {
-            Statement st = con.createStatement();
+        try (Statement st = con.createStatement()) {
             filasAfectadas = st.executeUpdate("DELETE FROM evento WHERE id=" + this.getId());
-            con.close();
         } catch (Exception e) {
             System.out.println("Error de SQL: " + e.getMessage());
         }
         return filasAfectadas;
     }
 
-    public int getCategoria(){
-    int id_categoriaEncontrado = 0;
-        Connection con = conectarBD();
-        
-        try {
-            Statement st = con.createStatement();
-            ResultSet rs =  st.executeQuery("SELECT id_categoria FROM evento WHERE id=" + this.getId());
+    public int getCategoria() {
+        int id_categoriaEncontrado = 0;
+        Connection con = Conexion.conectarBD();
+        try (Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT id_categoria FROM evento WHERE id=" + this.getId())) {
             if (rs.next()) {
                 id_categoriaEncontrado = rs.getInt(1);
             }
-            con.close();
         } catch (Exception e) {
             System.out.println("Error de SQL: " + e.getMessage());
         }
         return id_categoriaEncontrado;
     }
-    
-
-
-
 }
-

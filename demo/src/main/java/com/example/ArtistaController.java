@@ -1,3 +1,4 @@
+
 package com.example;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 
-public class EventoController {
+public class ArtistaController {
 
     @FXML
      TableView tableView;  
@@ -39,9 +40,6 @@ public class EventoController {
 
      @FXML
      private TableColumn<Evento, Integer> id_categoria;
-     
-
-
 
      private ObservableList<Evento> listaEventos = FXCollections.observableArrayList();
  

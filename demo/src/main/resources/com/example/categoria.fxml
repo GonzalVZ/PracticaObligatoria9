@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="535.0" prefWidth="797.0" spacing="10" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.EventoController">
+<VBox alignment="TOP_CENTER" prefHeight="535.0" prefWidth="797.0" spacing="10" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.CategoriaController">
     <children>
         <Label prefHeight="45.0" prefWidth="225.0" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Gestión de Eventos" />
         <fx:include source="botones.fxml" />

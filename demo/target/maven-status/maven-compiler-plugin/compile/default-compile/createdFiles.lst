@@ -1,4 +1,12 @@
-com/example/UsuarioController.class
+com/example/ArtistaController.class
+com/example/EventoController.class
 com/example/App.class
-module-info.class
+com/example/CategoriaController.class
+com/example/Evento.class
 com/example/Usuario.class
+com/example/Categoria.class
+com/example/Conexion.class
+com/example/Persona.class
+module-info.class
+com/example/UsuarioController.class
+com/example/ParticipanteController.class
