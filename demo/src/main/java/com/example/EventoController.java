@@ -9,8 +9,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 
@@ -37,6 +39,9 @@ public class EventoController {
      @FXML
      private TableColumn<Evento, String> fecha_fin;
 
+     @FXML
+     private TableColumn<Evento, Integer> id_categoria;
+
      
      
 
@@ -58,6 +63,8 @@ public class EventoController {
          lugar.setCellValueFactory(new PropertyValueFactory<>("lugar"));
          fecha_inicio.setCellValueFactory(new PropertyValueFactory<>("fecha_inicio"));
          fecha_fin.setCellValueFactory(new PropertyValueFactory<>("fecha_fin"));
+         id_categoria.setCellValueFactory(new PropertyValueFactory<>("id_categoria"));
+
         
  
          // Hacemos que las columnas nick y email sean editables (no el id)
@@ -67,38 +74,16 @@ public class EventoController {
          fecha_inicio.setCellFactory(TextFieldTableCell.forTableColumn());
          fecha_fin.setCellFactory(TextFieldTableCell.forTableColumn());
 
+            ObservableList<Integer> opcionesCategoria = FXCollections.observableArrayList(1, 2, 3, 4, 5);
+        id_categoria.setCellFactory(ComboBoxTableCell.forTableColumn(opcionesCategoria));
+
+          id_categoria.setOnEditCommit(event -> {
+          Evento evento = event.getRowValue();
+          evento.setId_categoria(event.getNewValue());
+});
+
  
-         // Asignamos un manejador de eventos para cuando se editen las celdas de la tabla
-         nombre.setOnEditCommit(event -> {
-             // Cuando se edita el campo "nick", se guarda automáticamente
-             Evento evento = event.getRowValue();
-             evento.setNombre(event.getNewValue()); // Actualiza el valor de la propiedad 'nick'
-             saveRow(evento);                  // Actualiza la fila en la base de datos
-         });        
-         descripcion.setOnEditCommit(event -> {
-            // Cuando se edita el campo "nick", se guarda automáticamente
-            Evento evento = event.getRowValue();
-            evento.setDescripcion(event.getNewValue()); // Actualiza el valor de la propiedad 'nick'
-            saveRow(evento);                  // Actualiza la fila en la base de datos
-        });   
-        lugar.setOnEditCommit(event -> {
-            // Cuando se edita el campo "nick", se guarda automáticamente
-            Evento evento = event.getRowValue();
-            evento.setLugar(event.getNewValue()); // Actualiza el valor de la propiedad 'nick'
-            saveRow(evento);                  // Actualiza la fila en la base de datos
-        }); 
-        fecha_inicio.setOnEditCommit(event -> {
-            // Cuando se edita el campo "nick", se guarda automáticamente
-            Evento evento = event.getRowValue();
-            evento.setFecha_inicio(event.getNewValue()); // Actualiza el valor de la propiedad 'nick'
-            saveRow(evento);                  // Actualiza la fila en la base de datos
-        }); 
-        fecha_fin.setOnEditCommit(event -> {
-            // Cuando se edita el campo "nick", se guarda automáticamente
-            Evento evento = event.getRowValue();
-            evento.setFecha_fin(event.getNewValue()); // Actualiza el valor de la propiedad 'nick'
-            saveRow(evento);                  // Actualiza la fila en la base de datos
-        });  
+         
          // Asignamos la ObservableList de usuarios al TableView. Así, cada vez que cambie la lista,
          // la vista se actualizará automáticamente.
          tableView.setItems(listaEventos);
@@ -114,7 +99,7 @@ public class EventoController {
      @FXML
      public void addRow() throws IOException {
          // Creamos un usuario vacío
-         Evento filaVacia = new Evento(Evento.getLastId()+1, "", "","","","",0);
+         Evento filaVacia = new Evento(Evento.getLastId()+1, "", "","","","",3);
  
          // Añadimos la fila vacía al ObservableList (esto lo añadirá también al TableView)
          listaEventos.add(filaVacia);

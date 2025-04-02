@@ -73,6 +73,7 @@ public abstract class Persona {
     public abstract int delete(int id);
     public abstract void getAll(ObservableList<Persona> lista);
     public abstract int getLastId();
-    public abstract void getTxt();
-}
+    public abstract ObservableList<Persona> get(String txt);
+    public abstract Persona get(int id);
 
+}

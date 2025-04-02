@@ -14,8 +14,8 @@ id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 nombre VARCHAR(50),
 descripcion TEXT,
 lugar VARCHAR(50),
-fecha_inicio DATE,
-fecha_fin DATE,
+fecha_inicio VARCHAR(50),
+fecha_fin VARCHAR(50),
  id_categoria INT UNSIGNED,
  FOREIGN KEY (id_categoria) REFERENCES categoria(id)
 

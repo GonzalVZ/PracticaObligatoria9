@@ -115,7 +115,7 @@ public class Evento {
     }
 
     public static ObservableList<Evento> getAll(ObservableList<Evento> listaEventos) {
-        String query = "SELECT * FROM evento";
+        String query = "SELECT * FROM evento ";
         try (Connection con = Conexion.conectarBD();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(query)) {
