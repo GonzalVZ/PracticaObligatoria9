@@ -61,49 +61,66 @@ public  class Categoria {
     }
 
     
- public static void getAll(ObservableList<Categoria> listaCategoria) {
-        String query = "SELECT * FROM categoria"; // Asegúrate de que la tabla 'evento' y sus columnas existan en la base de datos
+ public static ObservableList<Categoria> getAll(ObservableList<Categoria> listaCategoria) {
+        String query = "SELECT * FROM categoria"; 
         try (Connection con = Conexion.conectarBD();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(query)) {
     
             while (rs.next()) {
-                // Asegúrate de que los nombres de las columnas coincidan con los de tu tabla en la base de datos
+                
                 int id = rs.getInt("id");
                 String nombre = rs.getString("nombre");
                 String descripcion = rs.getString("descripcion");
                 
     
-                // Crea un nuevo objeto Categoria con los datos obtenidos
+                
                 Categoria categoria = new Categoria(id, nombre, descripcion);
     
-                // Agrega el objeto Categoria a la lista
+                
                 listaCategoria.add(categoria);
             }
         } catch (Exception e) {
             System.out.println("Error de SQL: " + e.getMessage());
         }
+        if (listaCategoria.isEmpty()) {
+            return null;
+        }
+        return listaCategoria;
     }
 
-    public static int getId(int id){
+    public static ObservableList<Categoria> getId(int id1,ObservableList<Categoria> listaCategoria){
         Integer idEncontrado = null;
         Connection con = Conexion.conectarBD();
         try {
             Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT id FROM categoria WHERE id = "+id);
-            if (rs.next()) {
-                idEncontrado = rs.getInt(1);
+            ResultSet rs = st.executeQuery("SELECT * FROM categoria WHERE id = "+id1);
+            while (rs.next()) {
                 
+                int id = rs.getInt("id");
+                String nombre = rs.getString("nombre");
+                String descripcion = rs.getString("descripcion");
+                
+    
+                
+                Categoria categoria = new Categoria(id, nombre, descripcion);
+    
+                
+                listaCategoria.add(categoria);
             }
 
         } catch (Exception e) {
             // TODO: handle exception
         }
 
-        return idEncontrado;
-
-
+        if (listaCategoria.isEmpty()) {
+            return null;
+        }
+        return listaCategoria;
     }
+
+
+    
 
     public static ObservableList<Categoria> getTxt(String txt,ObservableList<Categoria> listaCategoria){
         
@@ -162,15 +179,10 @@ public  class Categoria {
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM categoria WHERE id=" + this.getId());
             if (rs.next()) {
-                // Si el usuario ya existía, lo modificamos
-                //Statement st = con.prepareStatement("UPDATE evento SET  nombre='?', descripcion='?', lugar='?', fecha_inicio='?', fecha_fin='" + this.getFecha_fin() + "', id_categoria='" + this.getId_categoria() + "' WHERE id=" + this.getId());
-                //st.setString(1, this.getNombre());
-                //st.setString(2, this.getDescripcion());
-                filasAfectadas = st.executeUpdate("UPDATE categoria SET  nombre='" + this.getNombre() + "', descripcion='" + this.getDescripcion() );
+                
+                filasAfectadas = st.executeUpdate("UPDATE categoria SET  nombre='" + this.getNombre() + "', descripcion='" + this.getDescripcion()+ "' WHERE id=" + this.getId() );
             } else {
-                // Si el usuario no existía, lo añadimos
-                filasAfectadas = st.executeUpdate("INSERT INTO evento VALUES (" + this.getId() + ", '" + this.getNombre() + "', '" + this.getDescripcion() );
-            }
+                filasAfectadas = st.executeUpdate("INSERT INTO categoria (nombre, descripcion) VALUES ('" + this.getNombre() + "', '" + this.getDescripcion() + "')");            }
             con.close();
         } catch (Exception e) {
             System.out.println("Error de SQL: " + e.getMessage());
@@ -183,7 +195,7 @@ public  class Categoria {
         int filasAfectadas = 0;
         try {
             Statement st = con.createStatement();
-            filasAfectadas = st.executeUpdate("DELETE FROM categoria WHERE id=" + this.getId());
+            filasAfectadas = st.executeUpdate("DELETE  FROM categoria WHERE id=" + this.getId());
             con.close();
         } catch (Exception e) {
             System.out.println("Error de SQL: " + e.getMessage());

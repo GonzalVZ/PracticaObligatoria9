@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
@@ -17,9 +18,10 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("evento"));  // Carga la vista inicial
-        stage.setScene(scene);
-        stage.show();
+         scene = new Scene(loadFXML("evento"));  // Carga la vista inicial
+    stage.initStyle(StageStyle.UNDECORATED); // Elimina la barra de título predeterminada
+    stage.setScene(scene);
+    stage.show();
     }
 
     static void setRoot(String fxml) throws IOException {

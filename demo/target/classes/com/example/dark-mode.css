@@ -1,0 +1,150 @@
+/* Fondo general del TableView */
+.table-view {
+    -fx-background-color: #111111; /* Fondo del TableView */
+    -fx-control-inner-background: #212121; /* Fondo interno */
+    -fx-control-inner-background-alt: #212121; /* Fondo alternativo para filas */
+    -fx-text-fill: white; /* Color del texto */
+    -fx-table-cell-border-color: #212121; /* Color de los bordes de las celdas */
+    -fx-table-header-border-color: #212121; /* Color del borde del encabezado */
+}
+
+/* Fondo y texto de las filas */
+.table-row-cell {
+    -fx-background-color: #111111; /* Fondo de las filas */
+    -fx-text-fill: white; /* Color del texto */
+}
+
+/* Fondo y texto de las celdas */
+.table-cell {
+    -fx-background-color: #212121;
+    -fx-border-color: #212121; /* Fondo de las celdas */
+    -fx-text-fill: white; /* Color del texto */
+}
+
+/* Celdas dentro de la fila vacía */
+.table-row-cell:empty .table-cell {
+    -fx-background-color: #111111; /* Fondo negro */
+    -fx-border-color: #111111; /* Sin bordes */
+}
+
+/* Estilo del encabezado del TableView */
+.table-view .column-header-background {
+    -fx-background-color: #111111; /* Fondo negro */
+}
+
+.table-view .column-header {
+    -fx-background-color: #000000; /* Fondo negro */
+     /* Borde gris oscuro */
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white; /* Texto blanco */
+    -fx-font-weight: bold; /* Texto en negrita */
+}
+
+/* Eliminar cualquier indicación visual al seleccionar una fila */
+.table-row-cell:focused {
+    -fx-background-color: transparent; /* Fondo transparente */
+    -fx-border-color: transparent; /* Sin borde */
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #0078D7; /* Fondo negro para la fila seleccionada */
+    -fx-border-color: transparent; /* Sin borde */
+    -fx-text-fill: white; /* Texto blanco */
+}
+
+/* Eliminar el texto blanco en las filas seleccionadas */
+.table-row-cell:selected .table-cell {
+    -fx-background-color: #0078D7; /* Fondo negro para las celdas seleccionadas */
+    -fx-border-color: transparent; /* Sin borde */
+    -fx-text-fill: white; /* Texto blanco */
+}
+
+/* Placeholder (mensaje cuando no hay datos en el TableView) */
+.table-view .placeholder {
+    -fx-text-fill: #888888; /* Texto gris claro */
+    -fx-font-size: 14px; /* Tamaño de fuente */
+}
+
+/* Botones */
+.button {
+    -fx-background-color: #333333; /* Fondo gris oscuro */
+    -fx-text-fill: white; /* Texto blanco */
+    -fx-font-size: 14px; /* Tamaño de fuente */
+    -fx-border-radius: 5; /* Bordes redondeados */
+    -fx-padding: 5 10; /* Espaciado interno */
+    -fx-border-color: #444444; /* Borde gris oscuro */
+}
+
+.button:hover {
+    -fx-background-color: #555555; /* Fondo más claro al pasar el ratón */
+}
+
+.button:pressed {
+    -fx-background-color: #222222; /* Fondo más oscuro al presionar */
+}
+
+/* Barra de título personalizada */
+.hbox {
+    -fx-background-color: #1e1e1e; /* Fondo gris oscuro */
+    -fx-padding: 5; /* Espaciado interno */
+    -fx-border-color: #2e2e2e; /* Borde gris oscuro */
+    -fx-border-width: 0 0 1 0; /* Borde inferior */
+}
+
+/* Etiquetas */
+.label {
+    -fx-text-fill: white; /* Texto blanco */
+    -fx-font-size: 14px; /* Tamaño de fuente */
+}
+
+/* Scrollbars */
+.scroll-bar {
+    -fx-background-color: #111111; /* Fondo negro */
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #333333; /* Fondo gris oscuro */
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #555555; /* Fondo más claro al pasar el ratón */
+}
+
+/* TextField */
+.text-field {
+    -fx-background-color: #1e1e1e; /* Fondo gris oscuro */
+    -fx-text-fill: white; /* Texto blanco */
+    -fx-border-color: #2e2e2e; /* Borde gris oscuro */
+    -fx-border-radius: 5; /* Bordes redondeados */
+    -fx-padding: 5; /* Espaciado interno */
+}
+
+.text-field:focused {
+    -fx-border-color: #555555; /* Borde más claro al enfocar */
+}
+
+/* ComboBox */
+.combo-box {
+    -fx-background-color: #1e1e1e; /* Fondo gris oscuro */
+    -fx-text-fill: white; /* Texto blanco */
+    -fx-border-color: #2e2e2e; /* Borde gris oscuro */
+}
+
+.combo-box .list-cell {
+    -fx-background-color: #1e1e1e; /* Fondo gris oscuro */
+    -fx-text-fill: white; /* Texto blanco */
+}
+
+.combo-box .list-cell:hover {
+    -fx-background-color: #333333; /* Fondo más claro al pasar el ratón */
+}
+
+
+
+
+
+
+
+

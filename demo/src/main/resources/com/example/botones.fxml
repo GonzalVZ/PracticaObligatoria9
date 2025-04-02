@@ -6,9 +6,9 @@
 <HBox alignment="CENTER" prefHeight="41.0" prefWidth="797.0" spacing="20" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"  
       fx:controller="com.example.BotonesController">
             <children>
-                <Button onAction="#evento" text="Eventos" />
-                <Button onAction="#categoria" text="Categoria" />
-                <Button onAction="#participante" text="Participante" />
-                <Button mnemonicParsing="false" onAction="#artista" text="Artista" />
+                <Button onAction="#evento" text="Eventos" style="-fx-background-color: #333333; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5; -fx-padding: 5 10;"/>
+                <Button onAction="#categoria" text="Categoria" style="-fx-background-color: #333333; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5; -fx-padding: 5 10;" />
+                <Button onAction="#participante" text="Participante" style="-fx-background-color: #333333; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5; -fx-padding: 5 10;" />
+                <Button mnemonicParsing="false" onAction="#artista" text="Artista"  style="-fx-background-color: #333333; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5; -fx-padding: 5 10;"/>
             </children>
 </HBox>

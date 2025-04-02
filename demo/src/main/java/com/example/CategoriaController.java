@@ -6,16 +6,51 @@ import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
+import javafx.util.Callback;
 
 public class CategoriaController {
+
+    @FXML
+    private HBox barraTitulo;
+
+    private double xOffset = 0;
+    private double yOffset = 0;
+
+     @FXML
+    private void minimizarVentana(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setIconified(true); // Minimiza la ventana
+    }
+
+    @FXML
+    private void maximizarVentana(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        if (stage.isMaximized()) {
+            stage.setMaximized(false); // Restaura el tamaño original
+        } else {
+            stage.setMaximized(true); // Maximiza la ventana
+        }
+    }
+
+    @FXML
+    private void cerrarVentana(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.close(); // Cierra la ventana
+    }
 
     @FXML
      TableView tableView;  
@@ -29,6 +64,8 @@ public class CategoriaController {
      @FXML
      private TableColumn<Categoria, String> descripcion;
 
+     @FXML
+     private TableColumn<Categoria, Void> acciones;
     
 
 
@@ -37,11 +74,51 @@ public class CategoriaController {
      // En initialize() se inicializa el TableView y se asocia a la lista de usuarios.
      // ¡Esto solo hay que hacerlo una vez!
      public void initialize() {
+
+         acciones.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<Categoria, Void> call(final TableColumn<Categoria, Void> param) {
+                return new TableCell<>() {
+                    private final Button btnGuardar = new Button("✔");
+                    private final Button btnCancelar = new Button("✖");
+    
+                    {
+                        btnGuardar.setOnAction(event -> {
+                            Categoria categoria = getTableView().getItems().get(getIndex());
+                            saveRow(categoria); // Lógica para guardar los cambios
+                        });
+    
+                        btnCancelar.setOnAction(event -> {
+                            Categoria categoria = getTableView().getItems().get(getIndex());
+                            deleteRow(); // Lógica para cancelar los cambios
+                        });
+                    }
+    
+                    @Override
+                    protected void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || getTableView().getSelectionModel().getSelectedIndex() != getIndex()) {
+                            setGraphic(null); // Oculta los botones si la fila no está seleccionada
+                        } else {
+                            HBox hBox = new HBox(5, btnGuardar, btnCancelar);
+                            setGraphic(hBox); // Muestra los botones si la fila está seleccionada
+                        }
+                    }
+                };
+            }
+        });
+        tableView.getSelectionModel().selectedIndexProperty().addListener((obs, oldSelection, newSelection) -> {
+            tableView.refresh(); // Refresca el TableView para actualizar las celdas
+        });
+        tableView.setEditable(true);
+
          // Inicializamos las columnas de la tabla.
          id.setCellValueFactory(new PropertyValueFactory<>("id"));
          nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
          descripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
-         
+
+         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
  
          // Hacemos que las columnas nick y email sean editables (no el id)
          nombre.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -49,19 +126,19 @@ public class CategoriaController {
          
 
  
-         // Asignamos un manejador de Categorias para cuando se editen las celdas de la tabla
-         nombre.setOnEditCommit(event -> {
-             // Cuando se edita el campo "nick", se guarda automáticamente
-             Categoria Categoria = event.getRowValue();
-             Categoria.setNombre(event.getNewValue()); // Actualiza el valor de la propiedad 'nick'
-             saveRow(Categoria);                  // Actualiza la fila en la base de datos
-         });        
-         descripcion.setOnEditCommit(event -> {
-            // Cuando se edita el campo "nick", se guarda automáticamente
-            Categoria Categoria = event.getRowValue();
-            Categoria.setDescripcion(event.getNewValue()); // Actualiza el valor de la propiedad 'nick'
-            saveRow(Categoria);                  // Actualiza la fila en la base de datos
-        });   
+         
+        barraTitulo.setOnMousePressed(event -> {
+            Stage stage = (Stage) barraTitulo.getScene().getWindow();
+            xOffset = event.getSceneX();
+            yOffset = event.getSceneY();
+        });
+        
+        barraTitulo.setOnMouseDragged(event -> {
+            Stage stage = (Stage) barraTitulo.getScene().getWindow();
+            stage.setX(event.getScreenX() - xOffset);
+            stage.setY(event.getScreenY() - yOffset);
+        });
+        
           
          // Asignamos la ObservableList de usuarios al TableView. Así, cada vez que cambie la lista,
          // la vista se actualizará automáticamente.
@@ -90,8 +167,8 @@ public class CategoriaController {
  
  
      // Guarda un usuario en la base de datos
-     public void saveRow(Categoria Categoria) {
-        Categoria.save();   // Llamamos al modelo Usuario
+     public void saveRow(Categoria categoria) {
+        categoria.save();   // Llamamos al modelo Usuario
      }    
  
      // Elimina un usuario de la base de datos y del TableView
@@ -104,9 +181,9 @@ public class CategoriaController {
          Optional<ButtonType> result = a.showAndWait();
          if (result.get() == ButtonType.OK) {
              // Obtenemos el usuario seleccionado
-             Categoria Categoria = (Categoria) tableView.getSelectionModel().getSelectedItem();
-             Categoria.delete();  // Lo borramos de la base de datos
-             listaCategoria.remove(Categoria);  // Lo borramos del ObservableList y del TableView
+             Categoria categoria = (Categoria) tableView.getSelectionModel().getSelectedItem();
+             categoria.delete();  // Lo borramos de la base de datos
+             listaCategoria.remove(categoria);  // Lo borramos del ObservableList y del TableView
          }
      }
 }

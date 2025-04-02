@@ -5,18 +5,56 @@ import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node; // Importación correcta
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.stage.Stage;
+import javafx.util.Callback;
 
 public class EventoController {
+
+    @FXML
+    private HBox barraTitulo;
+
+    private double xOffset = 0;
+    private double yOffset = 0;
+
+     @FXML
+    private void minimizarVentana(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setIconified(true); // Minimiza la ventana
+    }
+
+    @FXML
+    private void maximizarVentana(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        if (stage.isMaximized()) {
+            stage.setMaximized(false); // Restaura el tamaño original
+        } else {
+            stage.setMaximized(true); // Maximiza la ventana
+        }
+    }
+
+    @FXML
+    private void cerrarVentana(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.close(); // Cierra la ventana
+    }
+
+    
 
     @FXML
      TableView tableView;  
@@ -42,7 +80,8 @@ public class EventoController {
      @FXML
      private TableColumn<Evento, Integer> id_categoria;
 
-     
+     @FXML
+    private TableColumn<Evento, Void> acciones;
      
 
 
@@ -52,6 +91,49 @@ public class EventoController {
      // En initialize() se inicializa el TableView y se asocia a la lista de usuarios.
      // ¡Esto solo hay que hacerlo una vez!
      public void initialize() {
+
+        
+       
+
+    
+        acciones.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<Evento, Void> call(final TableColumn<Evento, Void> param) {
+                return new TableCell<>() {
+                    private final Button btnGuardar = new Button("✔");
+                    private final Button btnCancelar = new Button("✖");
+    
+                    {
+                        btnGuardar.setOnAction(event -> {
+                            Evento evento = getTableView().getItems().get(getIndex());
+                            saveRow(evento); // Lógica para guardar los cambios
+                        });
+    
+                        btnCancelar.setOnAction(event -> {
+                            Evento evento = getTableView().getItems().get(getIndex());
+                            deleteRow(); // Lógica para cancelar los cambios
+                        });
+                    }
+    
+                    @Override
+                    protected void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || getTableView().getSelectionModel().getSelectedIndex() != getIndex()) {
+                            setGraphic(null); // Oculta los botones si la fila no está seleccionada
+                        } else {
+                            HBox hBox = new HBox(5, btnGuardar, btnCancelar);
+                            setGraphic(hBox); // Muestra los botones si la fila está seleccionada
+                        }
+                    }
+                };
+            }
+        });
+
+        
+
+        tableView.getSelectionModel().selectedIndexProperty().addListener((obs, oldSelection, newSelection) -> {
+            tableView.refresh(); // Refresca el TableView para actualizar las celdas
+        });
         tableView.setEditable(true);
 
 
@@ -65,21 +147,34 @@ public class EventoController {
          fecha_fin.setCellValueFactory(new PropertyValueFactory<>("fecha_fin"));
          id_categoria.setCellValueFactory(new PropertyValueFactory<>("id_categoria"));
 
-        
+         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
  
-         // Hacemos que las columnas nick y email sean editables (no el id)
          nombre.setCellFactory(TextFieldTableCell.forTableColumn());
          descripcion.setCellFactory(TextFieldTableCell.forTableColumn());
          lugar.setCellFactory(TextFieldTableCell.forTableColumn());
          fecha_inicio.setCellFactory(TextFieldTableCell.forTableColumn());
          fecha_fin.setCellFactory(TextFieldTableCell.forTableColumn());
 
-            ObservableList<Integer> opcionesCategoria = FXCollections.observableArrayList(1, 2, 3, 4, 5);
+            ObservableList<Integer> opcionesCategoria = FXCollections.observableArrayList(1, 2, 3, 4, 5,6);
         id_categoria.setCellFactory(ComboBoxTableCell.forTableColumn(opcionesCategoria));
 
           id_categoria.setOnEditCommit(event -> {
           Evento evento = event.getRowValue();
           evento.setId_categoria(event.getNewValue());
+          
+});
+
+barraTitulo.setOnMousePressed(event -> {
+    Stage stage = (Stage) barraTitulo.getScene().getWindow();
+    xOffset = event.getSceneX();
+    yOffset = event.getSceneY();
+});
+
+barraTitulo.setOnMouseDragged(event -> {
+    Stage stage = (Stage) barraTitulo.getScene().getWindow();
+    stage.setX(event.getScreenX() - xOffset);
+    stage.setY(event.getScreenY() - yOffset);
 });
 
  
@@ -108,7 +203,7 @@ public class EventoController {
          tableView.getSelectionModel().select(filaVacia);
          tableView.edit(tableView.getSelectionModel().getSelectedIndex(), nombre);
      }
- 
+     
  
      // Guarda un usuario en la base de datos
      public void saveRow(Evento evento) {
