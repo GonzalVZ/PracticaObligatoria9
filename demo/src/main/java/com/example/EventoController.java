@@ -157,7 +157,53 @@ public class EventoController {
          fecha_inicio.setCellFactory(TextFieldTableCell.forTableColumn());
          fecha_fin.setCellFactory(TextFieldTableCell.forTableColumn());
 
-// 
+// Cargar los nombres de todas las categorías para el ComboBox
+    ObservableList<String> nombresCategorias = FXCollections.observableArrayList();
+    Categoria.getNombres(nombresCategorias); // Llama al método para cargar todas las categorías
+
+    if (nombresCategorias == null || nombresCategorias.isEmpty()) {
+        System.out.println("No hay nombres de categorías disponibles.");
+    } else {
+        // Configurar la columna nombre_categoria con un ComboBoxTableCell
+        nombre_categoria.setCellFactory(ComboBoxTableCell.forTableColumn(nombresCategorias));
+
+        // Manejar el evento onEditCommit
+        nombre_categoria.setOnEditCommit(event -> {
+            Evento evento = event.getRowValue();
+            String nuevoNombreCategoria = event.getNewValue();
+
+            // Buscar el ID de la categoría correspondiente al nombre seleccionado
+            int nuevoIdCategoria = Categoria.getAll().stream()
+                .filter(categoria -> categoria.getNombre().equals(nuevoNombreCategoria))
+                .findFirst()
+                .map(Categoria::getId)
+                .orElse(-1);
+
+            if (nuevoIdCategoria == -1) {
+                System.out.println("Categoría no encontrada: " + nuevoNombreCategoria);
+            } else {
+                evento.setId_categoria(nuevoIdCategoria); // Actualizar el ID de la categoría en el objeto Evento
+            }
+        });
+    }
+
+    // Inicializar la columna nombre_categoria con los nombres de las categorías asociadas a los eventos
+    ObservableList<String> nombresCategoriasEvento = FXCollections.observableArrayList();
+    Categoria.getNombres1(nombresCategoriasEvento); // Llama al método para cargar las categorías de los eventos
+
+    if (nombresCategoriasEvento == null || nombresCategoriasEvento.isEmpty()) {
+        System.out.println("No hay categorías asociadas a los eventos.");
+    } else {
+        // Configurar la columna para mostrar los nombres iniciales de las categorías asociadas a los eventos
+        nombre_categoria.setCellValueFactory(cellData -> {
+            Evento evento = cellData.getValue();
+            String nombreCategoria = nombresCategoriasEvento.stream()
+                .filter(nombre -> nombre.equals(evento.getNombreCategoria()))
+                .findFirst()
+                .orElse("Sin categoría");
+            return new SimpleStringProperty(nombreCategoria);
+        });
+    }
 
 
 barraTitulo.setOnMousePressed(event -> {
@@ -185,7 +231,12 @@ barraTitulo.setOnMouseDragged(event -> {
          // al cambiar la lista de usuarios sin necesidad de hacer tableView.setItems(usuarios).
          // Si usuarios fuera un ArrayList convencional, habría que actualizar el tableView cada vez que cambiasen los datos de la lista.
      }
-     
+     private void loadDataNombres() {
+        Categoria.getNombres1(listaEventos);   // Llamamos al modelo Usuario
+        // Como tenemos el TableView asociado a la ObservableList usuarios, el TableView se actualizará automáticamente
+        // al cambiar la lista de usuarios sin necesidad de hacer tableView.setItems(usuarios).
+        // Si usuarios fuera un ArrayList convencional, habría que actualizar el tableView cada vez que cambiasen los datos de la lista.
+    }
  
      @FXML
      public void addRow() throws IOException {
