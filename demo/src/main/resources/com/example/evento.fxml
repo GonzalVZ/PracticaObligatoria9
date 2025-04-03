@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="1000.0" spacing="10" style="-fx-background-color: #111111;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.EventoController">
+<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="1000.0" spacing="10" style="-fx-background-color: #111111;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.EventoController">
     <children>
      <HBox fx:id="barraTitulo" alignment="CENTER_RIGHT" prefHeight="30.0" spacing="10" style="-fx-background-color: #111111;">
     <children>
@@ -26,7 +26,7 @@
                 <TableColumn fx:id="lugar" text="Lugar" />
                 <TableColumn fx:id="fecha_inicio" text="Inicio" />
                 <TableColumn fx:id="fecha_fin" text="Fin" />
-                <TableColumn fx:id="id_categoria" text="Categoria" />
+                <TableColumn fx:id="nombre_categoria" text="Categoria" />
             <TableColumn fx:id="acciones" maxWidth="150" minWidth="100" prefWidth="100" />
             </columns>
         </TableView>

@@ -3,6 +3,7 @@ package com.example;
 import java.io.IOException;
 import java.util.Optional;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -78,7 +79,7 @@ public class EventoController {
      private TableColumn<Evento, String> fecha_fin;
 
      @FXML
-     private TableColumn<Evento, Integer> id_categoria;
+     private TableColumn<Evento, String> nombre_categoria;
 
      @FXML
     private TableColumn<Evento, Void> acciones;
@@ -145,7 +146,7 @@ public class EventoController {
          lugar.setCellValueFactory(new PropertyValueFactory<>("lugar"));
          fecha_inicio.setCellValueFactory(new PropertyValueFactory<>("fecha_inicio"));
          fecha_fin.setCellValueFactory(new PropertyValueFactory<>("fecha_fin"));
-         id_categoria.setCellValueFactory(new PropertyValueFactory<>("id_categoria"));
+         nombre_categoria.setCellValueFactory(new PropertyValueFactory<>("nombre_categoria"));
 
          tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -156,14 +157,8 @@ public class EventoController {
          fecha_inicio.setCellFactory(TextFieldTableCell.forTableColumn());
          fecha_fin.setCellFactory(TextFieldTableCell.forTableColumn());
 
-            ObservableList<Integer> opcionesCategoria = FXCollections.observableArrayList(1, 2, 3, 4, 5,6);
-        id_categoria.setCellFactory(ComboBoxTableCell.forTableColumn(opcionesCategoria));
+// 
 
-          id_categoria.setOnEditCommit(event -> {
-          Evento evento = event.getRowValue();
-          evento.setId_categoria(event.getNewValue());
-          
-});
 
 barraTitulo.setOnMousePressed(event -> {
     Stage stage = (Stage) barraTitulo.getScene().getWindow();
@@ -190,6 +185,7 @@ barraTitulo.setOnMouseDragged(event -> {
          // al cambiar la lista de usuarios sin necesidad de hacer tableView.setItems(usuarios).
          // Si usuarios fuera un ArrayList convencional, habría que actualizar el tableView cada vez que cambiasen los datos de la lista.
      }
+     
  
      @FXML
      public void addRow() throws IOException {

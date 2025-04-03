@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="1000.0" spacing="10" style="-fx-background-color: #111111;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.CategoriaController">
+<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="1000.0" spacing="10" style="-fx-background-color: #111111;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.CategoriaController">
     <children>
      <HBox fx:id="barraTitulo" alignment="CENTER_RIGHT" prefHeight="30.0" spacing="10" style="-fx-background-color: #111111;">
     <children>

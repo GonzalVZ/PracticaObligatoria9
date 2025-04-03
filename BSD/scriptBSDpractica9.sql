@@ -17,7 +17,7 @@ lugar VARCHAR(50),
 fecha_inicio VARCHAR(50),
 fecha_fin VARCHAR(50),
  id_categoria INT UNSIGNED,
- FOREIGN KEY (id_categoria) REFERENCES categoria(id)
+ FOREIGN KEY (id_categoria) REFERENCES categoria(id) ON DELETE CASCADE
 
 );
 CREATE TABLE persona (
@@ -33,8 +33,8 @@ CREATE TABLE participa (
   id_persona INT UNSIGNED,
   fecha DATE,
   PRIMARY KEY (id_evento, id_persona),
-  FOREIGN KEY (id_evento) REFERENCES evento(id),
-  FOREIGN KEY (id_persona) REFERENCES persona(id)
+  FOREIGN KEY (id_evento) REFERENCES evento(id) ON DELETE CASCADE,
+  FOREIGN KEY (id_persona) REFERENCES persona(id) ON DELETE CASCADE
 );
 
 
@@ -84,4 +84,3 @@ INSERT INTO participa (id_evento, id_persona, fecha) VALUES
 (3, 3, '2023-10-15'); -- Carlos participa en el Maratón Anual
 
 
-SELECT * FROM persona INNER JOIN participa ON persona.id=participa.id_persona;

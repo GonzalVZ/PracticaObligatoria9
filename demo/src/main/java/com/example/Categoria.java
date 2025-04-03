@@ -3,11 +3,13 @@ package com.example;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public  class Categoria {
@@ -60,6 +62,39 @@ public  class Categoria {
         this.descripcion.set(descripcion);
     }
 
+
+
+    public static ObservableList<String> getNombres(ObservableList<String> nombresCategorias) {
+    ObservableList<String> listaNombres = FXCollections.observableArrayList();
+    String query = "SELECT nombre FROM categoria";
+    try (Connection con = Conexion.conectarBD();
+         Statement st = con.createStatement();
+         ResultSet rs = st.executeQuery(query)) {
+
+        while (rs.next()) {
+            String nombre = rs.getString("nombre");
+            listaNombres.add(nombre); // Agregar el nombre a la lista
+        }
+    } catch (Exception e) {
+        System.out.println("Error de SQL: " + e.getMessage());
+    }
+    return listaNombres;
+}
+public  static ObservableList<String> getNombres1(ObservableList<String> nombresCategorias) {
+    String query = "SELECT nombre.categoria FROM evento INNER JOIN categoria ON evento.id_categoria=categoria.id" ;
+    try (Connection con = Conexion.conectarBD();
+         Statement st = con.createStatement();
+         ResultSet rs = st.executeQuery(query)) {
+
+        while (rs.next()) {
+            String nombre = rs.getString("nombre");
+            nombresCategorias.add(nombre); // Agregar el nombre a la lista
+        }
+    } catch (Exception e) {
+        System.out.println("Error de SQL: " + e.getMessage());
+    }
+    return nombresCategorias;
+}
     
  public static ObservableList<Categoria> getAll(ObservableList<Categoria> listaCategoria) {
         String query = "SELECT * FROM categoria"; 
