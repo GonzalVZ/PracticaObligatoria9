@@ -1,4 +1,3 @@
-
 package com.example;
 
 import java.io.IOException;
@@ -22,15 +21,44 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+/**
+ * Controlador para la vista de gestión de categorías.
+ * Maneja la interfaz de usuario para crear, editar y eliminar categorías.
+ */
 public class CategoriaController {
 
+    //--------------------------------------------------
+    // CONTROLES DE INTERFAZ
+    //--------------------------------------------------
     @FXML
     private HBox barraTitulo;
 
+    @FXML
+    private TableView<Categoria> tableView;  // Corregido: se agrega el tipo genérico
+
+    @FXML
+    private TableColumn<Categoria, Integer> id;    
+ 
+    @FXML
+    private TableColumn<Categoria, String> nombre;   
+ 
+    @FXML
+    private TableColumn<Categoria, String> descripcion;
+
+    @FXML
+    private TableColumn<Categoria, Void> acciones;
+    
+    //--------------------------------------------------
+    // VARIABLES
+    //--------------------------------------------------
     private double xOffset = 0;
     private double yOffset = 0;
-
-     @FXML
+    private ObservableList<Categoria> listaCategoria = FXCollections.observableArrayList();
+ 
+    //--------------------------------------------------
+    // MÉTODOS DE CONTROL DE VENTANA
+    //--------------------------------------------------
+    @FXML
     private void minimizarVentana(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setIconified(true); // Minimiza la ventana
@@ -52,30 +80,43 @@ public class CategoriaController {
         stage.close(); // Cierra la ventana
     }
 
-    @FXML
-     TableView tableView;  
-
-     @FXML
-     private TableColumn<Categoria, Integer>id;    
- 
-     @FXML
-     private TableColumn<Categoria, String> nombre;   
- 
-     @FXML
-     private TableColumn<Categoria, String> descripcion;
-
-     @FXML
-     private TableColumn<Categoria, Void> acciones;
+    //--------------------------------------------------
+    // INICIALIZACIÓN
+    //--------------------------------------------------
+    public void initialize() {
+        // Configurar las columnas
+        configurarColumnas();
+        
+        // Configurar la columna de acciones
+        configurarColumnaAcciones();
+        
+        // Configurar selección y edición
+        configurarSeleccionYEdicion();
+        
+        // Configurar movimiento de ventana
+        configurarMovimientoVentana();
+        
+        // Asignar datos y cargar
+        tableView.setItems(listaCategoria);
+        loadData();    
+    }
     
-
-
-     private ObservableList<Categoria> listaCategoria = FXCollections.observableArrayList();
- 
-     // En initialize() se inicializa el TableView y se asocia a la lista de usuarios.
-     // ¡Esto solo hay que hacerlo una vez!
-     public void initialize() {
-
-         acciones.setCellFactory(new Callback<>() {
+    private void configurarColumnas() {
+        // Inicializamos las columnas de la tabla
+        id.setCellValueFactory(new PropertyValueFactory<>("id"));
+        nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        descripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
+        
+        // Hacer que las columnas sean editables
+        nombre.setCellFactory(TextFieldTableCell.forTableColumn());
+        descripcion.setCellFactory(TextFieldTableCell.forTableColumn());
+        
+        // Configurar política de redimensionamiento
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    }
+    
+    private void configurarColumnaAcciones() {
+        acciones.setCellFactory(new Callback<>() {
             @Override
             public TableCell<Categoria, Void> call(final TableColumn<Categoria, Void> param) {
                 return new TableCell<>() {
@@ -85,12 +126,11 @@ public class CategoriaController {
                     {
                         btnGuardar.setOnAction(event -> {
                             Categoria categoria = getTableView().getItems().get(getIndex());
-                            saveRow(categoria); // Lógica para guardar los cambios
+                            saveRow(categoria);
                         });
     
                         btnCancelar.setOnAction(event -> {
-                            Categoria categoria = getTableView().getItems().get(getIndex());
-                            deleteRow(); // Lógica para cancelar los cambios
+                            deleteRow();
                         });
                     }
     
@@ -107,26 +147,19 @@ public class CategoriaController {
                 };
             }
         });
+    }
+    
+    private void configurarSeleccionYEdicion() {
+        // Actualizar cuando cambie la selección
         tableView.getSelectionModel().selectedIndexProperty().addListener((obs, oldSelection, newSelection) -> {
             tableView.refresh(); // Refresca el TableView para actualizar las celdas
         });
+        
+        // Permitir edición
         tableView.setEditable(true);
-
-         // Inicializamos las columnas de la tabla.
-         id.setCellValueFactory(new PropertyValueFactory<>("id"));
-         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-         descripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
-
-         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
- 
-         // Hacemos que las columnas nick y email sean editables (no el id)
-         nombre.setCellFactory(TextFieldTableCell.forTableColumn());
-         descripcion.setCellFactory(TextFieldTableCell.forTableColumn());
-         
-
- 
-         
+    }
+    
+    private void configurarMovimientoVentana() {
         barraTitulo.setOnMousePressed(event -> {
             Stage stage = (Stage) barraTitulo.getScene().getWindow();
             xOffset = event.getSceneX();
@@ -138,52 +171,96 @@ public class CategoriaController {
             stage.setX(event.getScreenX() - xOffset);
             stage.setY(event.getScreenY() - yOffset);
         });
-        
-          
-         // Asignamos la ObservableList de usuarios al TableView. Así, cada vez que cambie la lista,
-         // la vista se actualizará automáticamente.
-         tableView.setItems(listaCategoria);
-         loadData();    
-     }
+    }
+
+    //--------------------------------------------------
+    // MANEJO DE DATOS
+    //--------------------------------------------------
     private void loadData() {
-         Categoria.getAll(listaCategoria);   // Llamamos al modelo Usuario
-         // Como tenemos el TableView asociado a la ObservableList usuarios, el TableView se actualizará automáticamente
-         // al cambiar la lista de usuarios sin necesidad de hacer tableView.setItems(usuarios).
-         // Si usuarios fuera un ArrayList convencional, habría que actualizar el tableView cada vez que cambiasen los datos de la lista.
-     }
+        listaCategoria.clear(); // Limpiar lista antes de cargar
+        Categoria.getAll(listaCategoria);
+    }
  
-     @FXML
-     public void addRow() throws IOException {
-         // Creamos un usuario vacío
-         Categoria filaVacia = new Categoria(Categoria.getLastId()+1, "", "");
+    @FXML
+    public void addRow() throws IOException {
+        // Crear categoría con ID 0 para que la base de datos lo genere
+        Categoria filaVacia = new Categoria(0, "", "");
  
-         // Añadimos la fila vacía al ObservableList (esto lo añadirá también al TableView)
-         listaCategoria.add(filaVacia);
+        // Añadir la fila vacía al ObservableList
+        listaCategoria.add(filaVacia);
  
-         // Seleccionamos la fila recién añadida y hacemos que sea editable
-         tableView.getSelectionModel().select(filaVacia);
-         tableView.edit(tableView.getSelectionModel().getSelectedIndex(), nombre);
-     }
+        // Seleccionar la fila recién añadida y hacerla editable
+        tableView.getSelectionModel().select(filaVacia);
+        tableView.edit(tableView.getSelectionModel().getSelectedIndex(), nombre);
+    }
  
+    public void saveRow(Categoria categoria) {
+        // Validar datos antes de guardar
+        if (categoria.getNombre().trim().isEmpty()) {
+            mostrarAlerta(AlertType.WARNING, "Datos incompletos", 
+                    "El nombre de la categoría no puede estar vacío.");
+            return;
+        }
+        
+        int resultado = categoria.save();
+        
+        if (resultado > 0) {
+            mostrarAlerta(AlertType.INFORMATION, "Guardado exitoso", 
+                    "La categoría ha sido guardada correctamente.");
+            
+            // Recargar datos para actualizar IDs y reflejar cambios de la BD
+            loadData();
+        } else {
+            mostrarAlerta(AlertType.ERROR, "Error al guardar", 
+                    "No se pudo guardar la categoría. Verifica la conexión a la base de datos.");
+        }
+    }    
  
-     // Guarda un usuario en la base de datos
-     public void saveRow(Categoria categoria) {
-        categoria.save();   // Llamamos al modelo Usuario
-     }    
- 
-     // Elimina un usuario de la base de datos y del TableView
-     @FXML
-     public void deleteRow() {
-         // Pedimos confirmación con un Alert antes de continuar
-         Alert a = new Alert(AlertType.CONFIRMATION);
-         a.setTitle("Confirmación");
-         a.setHeaderText("¿Estás seguro de que quieres borrar este usuario?");
-         Optional<ButtonType> result = a.showAndWait();
-         if (result.get() == ButtonType.OK) {
-             // Obtenemos el usuario seleccionado
-             Categoria categoria = (Categoria) tableView.getSelectionModel().getSelectedItem();
-             categoria.delete();  // Lo borramos de la base de datos
-             listaCategoria.remove(categoria);  // Lo borramos del ObservableList y del TableView
-         }
-     }
+    @FXML
+    public void deleteRow() {
+        Categoria categoria = tableView.getSelectionModel().getSelectedItem();
+        
+        if (categoria == null) {
+            mostrarAlerta(AlertType.WARNING, "Selección vacía", 
+                    "Debes seleccionar una categoría para eliminar.");
+            return;
+        }
+
+        // Pedir confirmación antes de eliminar
+        Alert alerta = new Alert(AlertType.CONFIRMATION);
+        alerta.setTitle("Confirmación");
+        alerta.setHeaderText("¿Estás seguro de que quieres borrar esta categoría?");
+        alerta.setContentText("Esta acción no se puede deshacer.");
+        
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        
+        if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+            try {
+                int filasAfectadas = categoria.delete();
+                
+                if (filasAfectadas > 0) {
+                    listaCategoria.remove(categoria);
+                    mostrarAlerta(AlertType.INFORMATION, "Eliminación exitosa", 
+                            "La categoría ha sido eliminada correctamente.");
+                } else {
+                    mostrarAlerta(AlertType.ERROR, "Error al eliminar", 
+                            "No se pudo eliminar la categoría. Podría estar siendo utilizada por eventos.");
+                }
+            } catch (Exception e) {
+                mostrarAlerta(AlertType.ERROR, "Error al eliminar", 
+                        "Error en la base de datos: " + e.getMessage());
+            }
+        }
+    }
+    
+    //--------------------------------------------------
+    // MÉTODOS AUXILIARES
+    //--------------------------------------------------
+    private void mostrarAlerta(AlertType tipo, String titulo, String mensaje) {
+        Alert alerta = new Alert(tipo);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(null);
+        alerta.setContentText(mensaje);
+        alerta.showAndWait();
+    }
 }
