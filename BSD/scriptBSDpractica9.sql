@@ -2,32 +2,34 @@ DROP DATABASE IF EXISTS EventoDB;
 CREATE DATABASE EventoDB CHARACTER SET utf8mb4;
 USE EventoDB;
 
-
+-- Crear tabla de categorías
 CREATE TABLE categoria(
-id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-nombre VARCHAR(50),
-descripcion TEXT
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(50),
+  descripcion TEXT
 );
 
+-- Crear tabla de eventos
 CREATE TABLE evento(
-id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-nombre VARCHAR(50),
-descripcion TEXT,
-lugar VARCHAR(50),
-fecha_inicio VARCHAR(50),
-fecha_fin VARCHAR(50),
- id_categoria INT UNSIGNED,
- FOREIGN KEY (id_categoria) REFERENCES categoria(id) ON DELETE CASCADE
-
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(50),
+  descripcion TEXT,
+  lugar VARCHAR(50),
+  fecha_inicio VARCHAR(50),
+  fecha_fin VARCHAR(50),
+  id_categoria INT UNSIGNED,
+  FOREIGN KEY (id_categoria) REFERENCES categoria(id) ON DELETE CASCADE
 );
+
+-- Crear tabla de personas
 CREATE TABLE persona (
-id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-nombre VARCHAR(50),
-apellido1 VARCHAR (50),
-apellido2 VARCHAR(50)
-
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(50),
+  apellido1 VARCHAR(50),
+  apellido2 VARCHAR(50)
 );
 
+-- Crear tabla de participaciones
 CREATE TABLE participa (
   id_evento INT UNSIGNED,
   id_persona INT UNSIGNED,
@@ -37,50 +39,60 @@ CREATE TABLE participa (
   FOREIGN KEY (id_persona) REFERENCES persona(id) ON DELETE CASCADE
 );
 
-
-
-
-
+-- Crear tabla de participantes (referencia a la tabla persona)
 CREATE TABLE participante(
-id_persona INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-email VARCHAR(50),
-FOREIGN KEY (id_persona) REFERENCES persona(id)
+  id_persona INT UNSIGNED PRIMARY KEY,
+  email VARCHAR(50),
+  FOREIGN KEY (id_persona) REFERENCES persona(id) ON DELETE CASCADE
 );
 
+-- Crear tabla de artistas (referencia a la tabla persona)
 CREATE TABLE artista (
-id_persona INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-fotografia VARCHAR(100),
-obra_destacada VARCHAR(100),
-FOREIGN KEY (id_persona) REFERENCES persona(id)
+  id_persona INT UNSIGNED PRIMARY KEY,
+  fotografia VARCHAR(100),
+  obra_destacada VARCHAR(100),
+  FOREIGN KEY (id_persona) REFERENCES persona(id) ON DELETE CASCADE
 );
 
+-- Nuevas categorías
 INSERT INTO categoria (nombre, descripcion) VALUES
-('Música', 'Eventos relacionados con conciertos y festivales de música'),
-('Arte', 'Exposiciones y eventos artísticos'),
-('Deportes', 'Eventos deportivos y competiciones');
+('Cine', 'Proyecciones y festivales de cine'),
+('Tecnología', 'Eventos relacionados con avances tecnológicos y conferencias');
 
+-- Nuevos eventos
 INSERT INTO evento (nombre, descripcion, lugar, fecha_inicio, fecha_fin, id_categoria) VALUES
-('Concierto de Rock', 'Un concierto de rock con bandas locales', 'Auditorio Nacional', '2023-11-01', '2023-11-01', 1),
-('Exposición de Pintura', 'Exposición de obras de artistas locales', 'Galería de Arte', '2023-12-01', '2023-12-15', 2),
-('Maratón Anual', 'Competencia de maratón en la ciudad', 'Parque Central', '2023-10-15', '2023-10-15', 3);
+('Festival de Cine', 'Proyección de películas independientes', 'Cinepolis Centro', '2023-12-05', '2023-12-10', 1),  -- id_categoria 1 para 'Cine'
+('Conferencia de Tecnología', 'Avances en inteligencia artificial', 'Centro de Convenciones', '2023-11-20', '2023-11-21', 2); -- id_categoria 2 para 'Tecnología'
 
+-- Nuevas personas
 INSERT INTO persona (nombre, apellido1, apellido2) VALUES
-('Juan', 'Pérez', 'Gómez'),
-('María', 'López', 'Hernández'),
-('Carlos', 'Martínez', 'Díaz');
+('Ana', 'García', 'Ramírez'),
+('Pedro', 'Sánchez', 'Morales'),
+('Lucía', 'Fernández', 'Torres'),
+('Javier', 'Hernández', 'López'),
+('Sofía', 'Martín', 'González');
 
+-- Nuevos participantes
 INSERT INTO participante (id_persona, email) VALUES
-(1, 'juan.perez@example.com'),
-(2, 'maria.lopez@example.com'),
-(3, 'carlos.martinez@example.com');
+(1, 'ana.garcia@example.com'),
+(2, 'pedro.sanchez@example.com'),
+(3, 'lucia.fernandez@example.com'),
+(4, 'javier.hernandez@example.com'),
+(5, 'sofia.martin@example.com');
 
+-- Nuevos artistas
 INSERT INTO artista (id_persona, fotografia, obra_destacada) VALUES
-(2, 'maria_foto.jpg', 'Paisaje al óleo'),
-(3, 'carlos_foto.jpg', 'Escultura moderna');
+(3, 'lucia_foto.jpg', 'Retrato al óleo'),
+(4, 'javier_foto.jpg', 'Instalación interactiva');
 
+-- Nuevas participaciones en eventos (varios participantes en un mismo evento)
 INSERT INTO participa (id_evento, id_persona, fecha) VALUES
-(1, 1, '2023-11-01'), -- Juan participa en el Concierto de Rock
-(2, 2, '2023-12-01'), -- María participa en la Exposición de Pintura
-(3, 3, '2023-10-15'); -- Carlos participa en el Maratón Anual
+(1, 1, '2023-11-01'), -- Ana participa en el Festival de Cine
+(1, 2, '2023-11-01'), -- Pedro participa en el Festival de Cine
+(1, 3, '2023-11-01'), -- Lucía participa en el Festival de Cine
+(2, 4, '2023-12-01'), -- Javier participa en la Conferencia de Tecnología
+(2, 5, '2023-12-01'), -- Sofía participa en la Conferencia de Tecnología
 
 
+
+SELECT participa.*,evento.*,persona.* FROM participa INNER JOIN evento ON  participa.id_evento=evento.id INNER JOIN persona ON participa.id_persona=persona.id;
