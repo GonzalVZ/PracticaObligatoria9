@@ -47,17 +47,11 @@ public class Participante extends Persona {
      * Constructor que incluye campos del join para la consulta.
      */
     public Participante(int id, String per_nombre, String apellido1, String apellido2, String email,
-                    String participaFecha, String evNombre, String evDescripcion,
-                    String evLugar, String evFechaInicio, String evFechaFin, int eventoId) {
+                    String participaFecha) {
         super(id, per_nombre, apellido1, apellido2);
         this.email = new SimpleStringProperty(email);
         this.participaFecha = new SimpleStringProperty(participaFecha);
-        this.evNombre = new SimpleStringProperty(evNombre);
-        this.evDescripcion = new SimpleStringProperty(evDescripcion);
-        this.evLugar = new SimpleStringProperty(evLugar);
-        this.evFechaInicio = new SimpleStringProperty(evFechaInicio);
-        this.evFechaFin = new SimpleStringProperty(evFechaFin);
-        this.eventoId = new SimpleIntegerProperty(eventoId);
+        
     }
 
     // Propiedades para JavaFX
@@ -91,56 +85,7 @@ public class Participante extends Persona {
         this.participaFecha.set(participaFecha);
     }
 
-    public StringProperty evNombreProperty() {
-        return evNombre;
-    }
-    public String getEvNombre() {
-        return evNombre.get();
-    }
-    public void setEvNombre(String evNombre) {
-        this.evNombre.set(evNombre);
-    }
-
-    public StringProperty evDescripcionProperty() {
-        return evDescripcion;
-    }
-    public String getEvDescripcion() {
-        return evDescripcion.get();
-    }
-    public void setEvDescripcion(String evDescripcion) {
-        this.evDescripcion.set(evDescripcion);
-    }
-
-    public StringProperty evLugarProperty() {
-        return evLugar;
-    }
-    public String getEvLugar() {
-        return evLugar.get();
-    }
-    public void setEvLugar(String evLugar) {
-        this.evLugar.set(evLugar);
-    }
-
-    public StringProperty evFechaInicioProperty() {
-        return evFechaInicio;
-    }
-    public String getEvFechaInicio() {
-        return evFechaInicio.get();
-    }
-    public void setEvFechaInicio(String evFechaInicio) {
-        this.evFechaInicio.set(evFechaInicio);
-    }
-
-    public StringProperty evFechaFinProperty() {
-        return evFechaFin;
-    }
-    public String getEvFechaFin() {
-        return evFechaFin.get();
-    }
-    public void setEvFechaFin(String evFechaFin) {
-        this.evFechaFin.set(evFechaFin);
-    }
-
+    
     // IMPLEMENTACIÓN DE MÉTODOS ABSTRACTOS DE Persona
     
     @Override
@@ -326,12 +271,7 @@ public int save() {
     public static ObservableList<Participante> getAll(ObservableList<Participante> lista) {
         String query = "SELECT persona.id, persona.nombre as per_nombre, persona.apellido1, persona.apellido2, " +
                        "participante.email, participa.fecha as participa_fecha, " +
-                       "evento.id as ev_id, " +
-                       "evento.nombre as ev_nombre, evento.descripcion as ev_descripcion, " +
-                       "evento.lugar as ev_lugar, evento.fecha_inicio as ev_fecha_inicio, " +
-                       "evento.fecha_fin as ev_fecha_fin " +
                        "FROM participa " +
-                       "INNER JOIN evento ON participa.id_evento = evento.id " +
                        "INNER JOIN persona ON participa.id_persona = persona.id " +
                        "INNER JOIN participante ON participante.id_persona = persona.id";
         try (Connection con = Conexion.conectarBD();
@@ -346,16 +286,9 @@ public int save() {
                 String apellido2 = rs.getString("apellido2");
                 String email = rs.getString("email");
                 String participaFecha = rs.getString("participa_fecha");
-                int eventoId = rs.getInt("ev_id");
-                String evNombre = rs.getString("ev_nombre");
-                String evDescripcion = rs.getString("ev_descripcion");
-                String evLugar = rs.getString("ev_lugar");
-                String evFechaInicio = rs.getString("ev_fecha_inicio");
-                String evFechaFin = rs.getString("ev_fecha_fin");
+               
 
-                Participante participante = new Participante(id, perNombre, apellido1, apellido2, email,
-                                                             participaFecha, evNombre, evDescripcion,
-                                                             evLugar, evFechaInicio, evFechaFin, eventoId);
+                Participante participante = new Participante(id, perNombre, apellido1, apellido2, email,participaFecha);
                 lista.add(participante);
             }
         } catch (Exception e) {

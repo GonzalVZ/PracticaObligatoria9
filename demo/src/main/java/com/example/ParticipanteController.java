@@ -41,15 +41,21 @@ public class ParticipanteController {
     private TableView<Participante> tableView;
 
     @FXML
-    private TableColumn<Participante, String> colPerNombre;      // persona.nombre
+    private TableView<Participante> tableView1;
+
     @FXML
-    private TableColumn<Participante, String> colApellido1;      // persona.apellido1
+    private TableColumn<Participante, String> nombre;      // persona.nombre
     @FXML
-    private TableColumn<Participante, String> colApellido2;      // persona.apellido2
+    private TableColumn<Participante, String> apellido1;      // persona.apellido1
     @FXML
-    private TableColumn<Participante, String> colEmail;          // participante.email
+    private TableColumn<Participante, String> apellido2;      // persona.apellido2
     @FXML
-    private TableColumn<Participante, String> colParticipaFecha; // participa.fecha
+    private TableColumn<Participante, String> email;          // participante.email
+    @FXML
+    private TableColumn<Participante, String> fecha; 
+    
+    
+    // participa.fecha
     @FXML
     private TableColumn<Participante, String> colEvNombre;       // evento.nombre
     @FXML
@@ -81,6 +87,7 @@ public class ParticipanteController {
         configurarMovimientoVentana();
         configurarSeleccionYEdicion();
         tableView.setItems(listaParticipantes);
+        tableView1.setItems(listaParticipantes);
         loadData();
     }
 
@@ -88,11 +95,11 @@ public class ParticipanteController {
     // CONFIGURACIÓN DE COLUMNAS
     //--------------------------------------------------
     private void configurarColumnas() {
-        colPerNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        colApellido1.setCellValueFactory(new PropertyValueFactory<>("apellido1"));
-        colApellido2.setCellValueFactory(new PropertyValueFactory<>("apellido2"));
-        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
-        colParticipaFecha.setCellValueFactory(new PropertyValueFactory<>("participaFecha"));
+        nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        apellido1.setCellValueFactory(new PropertyValueFactory<>("apellido1"));
+        apellido2.setCellValueFactory(new PropertyValueFactory<>("apellido2"));
+        email.setCellValueFactory(new PropertyValueFactory<>("email"));
+        fecha.setCellValueFactory(new PropertyValueFactory<>("participaFecha"));
         colEvNombre.setCellValueFactory(new PropertyValueFactory<>("evNombre"));
         colEvDescripcion.setCellValueFactory(new PropertyValueFactory<>("evDescripcion"));
         colEvLugar.setCellValueFactory(new PropertyValueFactory<>("evLugar"));
@@ -100,11 +107,11 @@ public class ParticipanteController {
         colEvFechaFin.setCellValueFactory(new PropertyValueFactory<>("evFechaFin"));
 
         // Hacer editables las columnas de los datos de persona, email y fecha
-        colPerNombre.setCellFactory(TextFieldTableCell.forTableColumn());
-        colApellido1.setCellFactory(TextFieldTableCell.forTableColumn());
-        colApellido2.setCellFactory(TextFieldTableCell.forTableColumn());
-        colEmail.setCellFactory(TextFieldTableCell.forTableColumn());
-        colParticipaFecha.setCellFactory(TextFieldTableCell.forTableColumn());
+        nombre.setCellFactory(TextFieldTableCell.forTableColumn());
+        apellido1.setCellFactory(TextFieldTableCell.forTableColumn());
+        apellido2.setCellFactory(TextFieldTableCell.forTableColumn());
+        email.setCellFactory(TextFieldTableCell.forTableColumn());
+        fecha.setCellFactory(TextFieldTableCell.forTableColumn());
         
         // Configurar la columna de eventos como ComboBox con interfaz personalizada 
         // Solución unificada para evitar duplicidad de configuración
@@ -155,24 +162,7 @@ public class ParticipanteController {
             return cell;
         });
         
-        // Configurar el manejador de eventos para cuando se cambia la selección del combo
-        colEvNombre.setOnEditCommit(event -> {
-            Participante p = event.getRowValue();
-            String nuevoValor = event.getNewValue();
-            
-            // Obtener el evento correspondiente al nombre seleccionado
-            Evento eventoSeleccionado = eventosMap.get(nuevoValor);
-            if (eventoSeleccionado != null) {
-                p.setEvNombre(nuevoValor);
-                p.setEventoId(eventoSeleccionado.getId());
-                p.setEvDescripcion(eventoSeleccionado.getDescripcion());
-                p.setEvLugar(eventoSeleccionado.getLugar());
-                p.setEvFechaInicio(eventoSeleccionado.getFecha_inicio());
-                p.setEvFechaFin(eventoSeleccionado.getFecha_fin());
-                tableView.refresh();
-            }
-        });
-
+       
         // Configurar columna de acciones (guardar/eliminar)
         colAcciones.setCellFactory(new Callback<TableColumn<Participante, Void>, TableCell<Participante, Void>>() {
             @Override
@@ -263,7 +253,7 @@ public class ParticipanteController {
         Participante nuevo = new Participante(0, "", "", "", "");
         listaParticipantes.add(nuevo);
         tableView.getSelectionModel().select(nuevo);
-        tableView.edit(tableView.getSelectionModel().getSelectedIndex(), colPerNombre);
+        tableView.edit(tableView.getSelectionModel().getSelectedIndex(), nombre);
     }
 
     public void saveRow(Participante p) {

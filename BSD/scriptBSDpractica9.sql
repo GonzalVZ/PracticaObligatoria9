@@ -66,28 +66,29 @@ CREATE TABLE artista (
 -- -----------------------------------------------------------------------
 
 -- Inserción de categorías
-INSERT INTO categoria (nombre, descripcion) VALUES
-('Exposición', 'Exhibición de obras artísticas'),
-('Concierto', 'Eventos musicales en vivo'),
-('Cine', 'Proyecciones y festivales de cine'),
-('Tecnología', 'Eventos relacionados con avances tecnológicos y conferencias');
+-- Inserción de categorías
+INSERT INTO categoria (id, nombre, descripcion) VALUES
+(1, 'Exposición', 'Exhibición de obras artísticas'),
+(2, 'Concierto', 'Eventos musicales en vivo'),
+(3, 'Cine', 'Proyecciones y festivales de cine'),
+(4, 'Tecnología', 'Eventos relacionados con avances tecnológicos y conferencias');
 
 -- Inserción de eventos
-INSERT INTO evento (nombre, descripcion, lugar, fecha_inicio, fecha_fin, id_categoria) VALUES
-('Exposición de Arte Moderno', 'Muestra de arte contemporáneo', 'Galería Central', '2023-10-15', '2023-11-15', 1),
-('Concierto de Verano', 'Festival musical al aire libre', 'Parque Municipal', '2023-08-20', '2023-08-22', 2),
-('Festival de Cine', 'Proyección de películas independientes', 'Cinepolis Centro', '2023-12-05', '2023-12-10', 3),
-('Conferencia de Tecnología', 'Avances en inteligencia artificial', 'Centro de Convenciones', '2023-11-20', '2023-11-21', 4);
+INSERT INTO evento (id, nombre, descripcion, lugar, fecha_inicio, fecha_fin, id_categoria) VALUES
+(1, 'Exposición de Arte Moderno', 'Muestra de arte contemporáneo', 'Galería Central', '2023-10-15', '2023-11-15', 1),
+(2, 'Concierto de Verano', 'Festival musical al aire libre', 'Parque Municipal', '2023-08-20', '2023-08-22', 2),
+(3, 'Festival de Cine', 'Proyección de películas independientes', 'Cinepolis Centro', '2023-12-05', '2023-12-10', 3),
+(4, 'Conferencia de Tecnología', 'Avances en inteligencia artificial', 'Centro de Convenciones', '2023-11-20', '2023-11-21', 4);
 
 -- Inserción de personas
-INSERT INTO persona (nombre, apellido1, apellido2) VALUES
-('Ana', 'García', 'Ramírez'),
-('Pedro', 'Sánchez', 'Morales'),
-('Lucía', 'Fernández', 'Torres'),
-('Javier', 'Hernández', 'López'),
-('Sofía', 'Martín', 'González'),
-('Carlos', 'Rodríguez', 'Pérez'),
-('María', 'López', 'Gómez');
+INSERT INTO persona (id, nombre, apellido1, apellido2) VALUES
+(1, 'Ana', 'García', 'Ramírez'),
+(2, 'Pedro', 'Sánchez', 'Morales'),
+(3, 'Lucía', 'Fernández', 'Torres'),
+(4, 'Javier', 'Hernández', 'López'),
+(5, 'Sofía', 'Martín', 'González'),
+(6, 'Carlos', 'Rodríguez', 'Pérez'),
+(7, 'María', 'López', 'Gómez');
 
 -- Inserción de participantes
 INSERT INTO participante (id_persona, email) VALUES
@@ -114,7 +115,6 @@ INSERT INTO participa (id_evento, id_persona, fecha) VALUES
 (4, 4, '2023-11-20'), -- Javier participa en la Conferencia de Tecnología
 (4, 5, '2023-11-20'), -- Sofía participa en la Conferencia de Tecnología
 (4, 7, '2023-11-21'); -- María participa en la Conferencia de Tecnología
-
 -- -----------------------------------------------------------------------
 -- CONSULTAS DE VERIFICACIÓN
 -- -----------------------------------------------------------------------

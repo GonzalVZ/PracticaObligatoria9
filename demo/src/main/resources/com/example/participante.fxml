@@ -7,10 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="831.0" prefWidth="1418.0" spacing="10"
-      style="-fx-background-color: #111111;" 
-      xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="com.example.ParticipanteController">
+<VBox alignment="TOP_CENTER" prefHeight="831.0" prefWidth="1418.0" spacing="10" style="-fx-background-color: #111111;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.ParticipanteController">
     <children>
         <HBox fx:id="barraTitulo" alignment="CENTER_RIGHT" prefHeight="30.0" spacing="10" style="-fx-background-color: #111111;">
             <children>
@@ -19,7 +16,7 @@
                 <Button onAction="#cerrarVentana" style="-fx-background-color: #111111; -fx-text-fill: white;" text="✖" />
             </children>
         </HBox>
-        <Label prefHeight="65.0" prefWidth="334.0" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="GESTIONAR PARTICIPANTES" textFill="WHITE" />
+        <Label prefHeight="27.0" prefWidth="382.0" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="GESTIONAR PARTICIPANTES" textFill="WHITE" />
 
         <!-- Incluir botones de navegación -->
         <fx:include source="botones.fxml" />
@@ -27,29 +24,28 @@
         <TableView fx:id="tableView" prefHeight="467.0" prefWidth="1155.0" stylesheets="@dark-mode.css">
             <columns>
                 <!-- Columnas de Persona -->
-                <TableColumn fx:id="colPerNombre" text="Nombre" />
-                <TableColumn fx:id="colApellido1" prefWidth="108.0" text="Primer Apellido" />
-                <TableColumn fx:id="colApellido2" prefWidth="129.0" text="Segundo Apellido" />
+                <TableColumn fx:id="nombre" text="Nombre" />
+                <TableColumn fx:id="apellido1" prefWidth="108.0" text="Primer Apellido" />
+                <TableColumn fx:id="apellido2" prefWidth="129.0" text="Segundo Apellido" />
                 <!-- Columna de Participante -->
-                <TableColumn fx:id="colEmail" text="Email" />
+                <TableColumn fx:id="email" text="Email" />
                 <!-- Datos de la participación -->
-                <TableColumn fx:id="colParticipaFecha" text="Fecha Participación" />
-                <!-- Datos del Evento (el nombre será editable con ComboBox) -->
-<TableColumn fx:id="colEvNombre" text="Evento (seleccionar)" prefWidth="130.0" />                <TableColumn fx:id="colEvDescripcion" maxWidth="150" minWidth="100" prefWidth="113.0" text="Descripción" />
-                <TableColumn fx:id="colEvLugar" maxWidth="150" minWidth="100" prefWidth="113.0" text="Lugar" />
-                <TableColumn fx:id="colEvFechaInicio" maxWidth="150" minWidth="100" prefWidth="113.0" text="Fecha Inicio" />
-                <TableColumn fx:id="colEvFechaFin" maxWidth="150" minWidth="100" prefWidth="113.0" text="Fecha Fin" />
-                <!-- Columna para Acciones -->
-                <TableColumn fx:id="colAcciones" text="Acciones" />
+                <TableColumn fx:id="fecha" prefWidth="156.0" text="Fecha Participación" />
             </columns>
         </TableView>
-        
-        <!-- Contenedor para el botón "Nuevo" -->
-        <HBox alignment="CENTER" prefHeight="63.0" prefWidth="797.0" spacing="10">
-            <children>
-                <Button fx:id="btnNuevo" onAction="#addRow" 
-                        style="-fx-background-color: #333333; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5; -fx-padding: 5 10;" text="Nuevo" />
-            </children>
-        </HBox>
+        <VBox spacing="5">
+         <children>
+            <TableView fx:id="tableView1" prefHeight="467.0" prefWidth="1155.0" stylesheets="@dark-mode.css">
+               <columns>
+                  <TableColumn fx:id="colEvNombre" prefWidth="130.0" text="Evento (seleccionar)" />
+                  <TableColumn fx:id="colEvDescripcion" maxWidth="150" minWidth="100" prefWidth="113.0" text="Descripción" />
+                  <TableColumn fx:id="colEvLugar" maxWidth="150" minWidth="100" prefWidth="113.0" text="Lugar" />
+                  <TableColumn fx:id="colEvFechaInicio" maxWidth="150" minWidth="100" prefWidth="113.0" text="Fecha Inicio" />
+                  <TableColumn fx:id="colEvFechaFin" maxWidth="150" minWidth="100" prefWidth="113.0" text="Fecha Fin" />
+                  <TableColumn fx:id="colAcciones" text="Acciones" />
+               </columns>
+            </TableView>
+         </children>
+    </VBox>
     </children>
 </VBox>
