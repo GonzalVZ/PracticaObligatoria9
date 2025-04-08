@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
 
 <VBox alignment="TOP_CENTER" prefHeight="831.0" prefWidth="1418.0" spacing="10" style="-fx-background-color: #111111;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.ParticipanteController">
     <children>
@@ -29,23 +30,42 @@
                 <TableColumn fx:id="apellido2" prefWidth="129.0" text="Segundo Apellido" />
                 <!-- Columna de Participante -->
                 <TableColumn fx:id="email" text="Email" />
-                <!-- Datos de la participación -->
-                <TableColumn fx:id="fecha" prefWidth="156.0" text="Fecha Participación" />
+                <!-- Columna de acciones -->
+                <TableColumn fx:id="accionesParticipante" text="Acciones" prefWidth="120.0" />
             </columns>
         </TableView>
         <VBox spacing="5">
          <children>
+            <!-- Añadir área para mensaje cuando no hay eventos -->
+            <HBox fx:id="hboxEventosDisponibles" alignment="CENTER" spacing="10" visible="false">
+               <children>
+                  <Label text="No hay eventos asignados a este participante" textFill="white" />
+                  <Button fx:id="btnMostrarEventosDisponibles" onAction="#mostrarEventosDisponibles" 
+                         style="-fx-background-color: #4CAF50; -fx-text-fill: white;" 
+                         text="Ver eventos disponibles" />
+               </children>
+               <padding>
+                  <Insets top="10" bottom="10" />
+               </padding>
+            </HBox>
+            
             <TableView fx:id="tableView1" prefHeight="467.0" prefWidth="1155.0" stylesheets="@dark-mode.css">
                <columns>
                   <TableColumn fx:id="colEvNombre" prefWidth="130.0" text="Evento (seleccionar)" />
                   <TableColumn fx:id="colEvDescripcion" maxWidth="150" minWidth="100" prefWidth="113.0" text="Descripción" />
                   <TableColumn fx:id="colEvLugar" maxWidth="150" minWidth="100" prefWidth="113.0" text="Lugar" />
+                  <TableColumn fx:id="colFechaParticipacion" maxWidth="150" minWidth="100" prefWidth="113.0" text="Fecha Participación" />
                   <TableColumn fx:id="colEvFechaInicio" maxWidth="150" minWidth="100" prefWidth="113.0" text="Fecha Inicio" />
                   <TableColumn fx:id="colEvFechaFin" maxWidth="150" minWidth="100" prefWidth="113.0" text="Fecha Fin" />
                   <TableColumn fx:id="colAcciones" text="Acciones" />
                </columns>
             </TableView>
          </children>
-    </VBox>
+        </VBox>
+        <HBox alignment="CENTER" prefHeight="63.0" prefWidth="797.0" spacing="10">
+            <children>
+                <Button fx:id="btnNuevo" onAction="#addRow" style="-fx-background-color: #333333; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5; -fx-padding: 5 10;" text="Nuevo" />
+            </children>
+        </HBox>
     </children>
 </VBox>

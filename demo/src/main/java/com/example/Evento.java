@@ -27,6 +27,8 @@ public class Evento {
     private StringProperty fecha_inicio;
     private StringProperty fecha_fin;
     private IntegerProperty id_categoria;
+    private StringProperty fechaParticipacion; // Fecha en que un participante se inscribió en este evento
+    private StringProperty fechaActuacion; // Fecha en que un artista actúa en este evento
 
     //--------------------------------------------------
     // CONSTRUCTOR
@@ -50,6 +52,8 @@ public class Evento {
         this.fecha_inicio = new SimpleStringProperty(fecha_inicio);
         this.fecha_fin = new SimpleStringProperty(fecha_fin);
         this.id_categoria = new SimpleIntegerProperty(id_categoria);
+        this.fechaParticipacion = new SimpleStringProperty("");
+        this.fechaActuacion = new SimpleStringProperty("");
     }
 
     //--------------------------------------------------
@@ -109,6 +113,22 @@ public class Evento {
      */
     public IntegerProperty id_categoriaProperty() {
         return id_categoria;
+    }
+    
+    /**
+     * Obtiene la propiedad de la fecha de participación para uso en JavaFX.
+     * @return La propiedad fechaParticipacion como StringProperty
+     */
+    public StringProperty fechaParticipacionProperty() {
+        return fechaParticipacion;
+    }
+    
+    /**
+     * Obtiene la propiedad de la fecha de actuación para uso en JavaFX.
+     * @return La propiedad fechaActuacion como StringProperty
+     */
+    public StringProperty fechaActuacionProperty() {
+        return fechaActuacion;
     }
 
     //--------------------------------------------------
@@ -225,6 +245,38 @@ public class Evento {
     public void setId_categoria(int id_categoria) {
         this.id_categoria.set(id_categoria);
     }
+    
+    /**
+     * Obtiene la fecha en que un participante se inscribió en este evento.
+     * @return La fecha de participación como String
+     */
+    public String getFechaParticipacion() {
+        return fechaParticipacion.get();
+    }
+    
+    /**
+     * Establece la fecha en que un participante se inscribió en este evento.
+     * @param fechaParticipacion La nueva fecha de participación
+     */
+    public void setFechaParticipacion(String fechaParticipacion) {
+        this.fechaParticipacion.set(fechaParticipacion);
+    }
+    
+    /**
+     * Obtiene la fecha en que un artista actúa en este evento.
+     * @return La fecha de actuación como String
+     */
+    public String getFechaActuacion() {
+        return fechaActuacion.get();
+    }
+    
+    /**
+     * Establece la fecha en que un artista actúa en este evento.
+     * @param fechaActuacion La nueva fecha de actuación
+     */
+    public void setFechaActuacion(String fechaActuacion) {
+        this.fechaActuacion.set(fechaActuacion);
+    }
 
     //--------------------------------------------------
     // MÉTODOS DE ACCESO A DATOS (ESTÁTICOS)
@@ -254,7 +306,8 @@ public class Evento {
                 listaEventos.add(evento);
             }
         } catch (Exception e) {
-            System.out.println("Error de SQL: " + e.getMessage());
+            System.out.println("Error de SQL en Evento.getAll(): " + e.getMessage());
+            e.printStackTrace();
         }
         if (listaEventos.isEmpty()) {
             return null;
@@ -289,7 +342,8 @@ public class Evento {
                 listaEventos.add(evento);
             }
         } catch (Exception e) {
-            System.err.println("Error de SQL: " + e.getMessage());
+            System.out.println("Error de SQL en Evento.getId(): " + e.getMessage());
+            e.printStackTrace();
         } 
 
         if (listaEventos.isEmpty()) {
@@ -327,7 +381,8 @@ public class Evento {
                 listaEventos.add(evento);
             }
         } catch (Exception e) {
-            System.err.println("Error de SQL: " + e.getMessage());
+            System.out.println("Error de SQL en Evento.getTxt(): " + e.getMessage());
+            e.printStackTrace();
         } 
 
         if (listaEventos.isEmpty()) {
@@ -351,7 +406,8 @@ public class Evento {
                 return rs.getInt(1);
             }
         } catch (Exception e) {
-            System.out.println("Error de SQL: " + e.getMessage());
+            System.out.println("Error de SQL en Evento.getLastId(): " + e.getMessage());
+            e.printStackTrace();
         }
         return 0;
     }
@@ -402,7 +458,8 @@ public class Evento {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error de SQL: " + e.getMessage());
+            System.out.println("Error de SQL en Evento.save(): " + e.getMessage());
+            e.printStackTrace();
         }
         return 0;
     }
@@ -419,7 +476,8 @@ public class Evento {
             ps.setInt(1, this.getId());
             return ps.executeUpdate();
         } catch (Exception e) {
-            System.out.println("Error de SQL: " + e.getMessage());
+            System.out.println("Error de SQL en Evento.delete(): " + e.getMessage());
+            e.printStackTrace();
         }
         return 0;
     }
@@ -439,7 +497,8 @@ public class Evento {
                 return rs.getInt(1);
             }
         } catch (Exception e) {
-            System.out.println("Error de SQL: " + e.getMessage());
+            System.out.println("Error de SQL en Evento.getCategoria(): " + e.getMessage());
+            e.printStackTrace();
         }
         return 0;
     }
