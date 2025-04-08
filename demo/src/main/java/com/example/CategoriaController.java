@@ -36,8 +36,7 @@ public class CategoriaController {
     @FXML
     private TableView<Categoria> tableView;  // Corregido: se agrega el tipo genérico
 
-    @FXML
-    private TableColumn<Categoria, Integer> id;    
+      
  
     @FXML
     private TableColumn<Categoria, String> nombre;   
@@ -103,7 +102,7 @@ public class CategoriaController {
     
     private void configurarColumnas() {
         // Inicializamos las columnas de la tabla
-        id.setCellValueFactory(new PropertyValueFactory<>("id"));
+        
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         descripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
         

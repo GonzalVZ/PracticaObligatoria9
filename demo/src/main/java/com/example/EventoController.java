@@ -10,14 +10,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -39,9 +42,6 @@ public class EventoController {
     @FXML
     TableView<Evento> tableView;  
 
-    @FXML
-    private TableColumn<Evento, Integer> id;    
- 
     @FXML
     private TableColumn<Evento, String> nombre;   
  
@@ -130,7 +130,7 @@ public class EventoController {
     
     private void configurarColumnas() {
         // Configurar cell value factories
-        id.setCellValueFactory(new PropertyValueFactory<>("id"));
+        
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         descripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
         lugar.setCellValueFactory(new PropertyValueFactory<>("lugar"));
@@ -160,8 +160,51 @@ public class EventoController {
             return new SimpleStringProperty(nombreCategoria);
         });
         
-        // Configurar ComboBox para edición
-        nombre_categoria.setCellFactory(ComboBoxTableCell.forTableColumn(nombresCategorias));
+        // Configurar ComboBox con interfaz personalizada
+        nombre_categoria.setCellFactory(column -> {
+            return new ComboBoxTableCell<Evento, String>(nombresCategorias) {
+                {
+                    // Añadir tooltip a la celda
+                    setTooltip(new Tooltip("Haga clic para seleccionar una categoría"));
+                }
+                
+                @Override
+                public void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    
+                    if (item == null || empty) {
+                        setText(null);
+                        setGraphic(null);
+                    } else {
+                        // Crear contenedor para texto e indicador
+                        HBox content = new HBox(5);
+                        content.setAlignment(Pos.CENTER_LEFT);
+                        
+                        // Texto de la categoría
+                        Label texto = new Label(item);
+                        
+                        // Indicador de desplegable
+                        Label indicador = new Label("▼");
+                        indicador.setStyle("-fx-text-fill: #666666; -fx-font-size: 8pt;");
+                        
+                        content.getChildren().addAll(texto, indicador);
+                        
+                        // Aplicar estilo para que parezca un combo box
+                        setStyle("-fx-background-color: #3c3c3c; -fx-border-color: #555555; -fx-border-radius: 3;");
+                        
+                        // Establecer el contenido personalizado
+                        setText(null);
+                        setGraphic(content);
+                    }
+                }
+                
+                // Activar automáticamente el editor al hacer clic
+                @Override
+                public void startEdit() {
+                    super.startEdit();
+                }
+            };
+        });
         
         // Configurar acción al editar
         nombre_categoria.setOnEditCommit(event -> {
@@ -257,7 +300,13 @@ public class EventoController {
      
     // Guarda un evento en la base de datos
     public void saveRow(Evento evento) {
-        evento.save();
+        int result = evento.save();
+        if (result > 0) {
+            showAlert(AlertType.INFORMATION, "Guardado", "Evento guardado correctamente.");
+            loadData();
+        } else {
+            showAlert(AlertType.ERROR, "Error", "No se pudo guardar el evento.");
+        }
     }    
  
     // Elimina un evento de la base de datos y del TableView
@@ -271,8 +320,25 @@ public class EventoController {
         if (result.get() == ButtonType.OK) {
             // Obtenemos el evento seleccionado
             Evento evento = (Evento) tableView.getSelectionModel().getSelectedItem();
-            evento.delete();  // Lo borramos de la base de datos
-            listaEventos.remove(evento);  // Lo borramos del ObservableList y del TableView
+            int success = evento.delete();
+            
+            if (success > 0) {
+                listaEventos.remove(evento);  // Lo borramos del ObservableList y del TableView
+                showAlert(AlertType.INFORMATION, "Eliminado", "Evento eliminado correctamente.");
+            } else {
+                showAlert(AlertType.ERROR, "Error", "No se pudo eliminar el evento.");
+            }
         }
+    }
+    
+    //--------------------------------------------------
+    // MÉTODO AUXILIAR PARA MOSTRAR ALERTAS
+    //--------------------------------------------------
+    private void showAlert(AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

@@ -71,7 +71,6 @@ public abstract class Persona {
     // Métodos abstractos que las subclases deben implementar
     public abstract int save();
     public abstract int delete(int id);
-    public abstract void getAll(ObservableList<Persona> lista);
     public abstract int getLastId();
     public abstract ObservableList<Persona> get(String txt);
     public abstract Persona get(int id);

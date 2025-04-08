@@ -20,7 +20,6 @@
         <fx:include source="botones.fxml" />
         <TableView fx:id="tableView" prefHeight="367.0" prefWidth="1000.0" stylesheets="@dark-mode.css">
             <columns>
-                <TableColumn fx:id="id" prefWidth="93.0" text="ID" maxWidth="100"/>
                 <TableColumn fx:id="nombre" prefWidth="97.0" text="Nombre" maxWidth="150"/>
                 <TableColumn fx:id="descripcion" prefWidth="174.0" text="Descripción" />
                 <TableColumn fx:id="acciones" maxWidth="150" minWidth="100" prefWidth="100" />

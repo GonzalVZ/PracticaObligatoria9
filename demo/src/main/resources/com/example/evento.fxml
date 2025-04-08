@@ -20,14 +20,12 @@
         <fx:include source="botones.fxml" />
         <TableView fx:id="tableView" prefHeight="367.0" prefWidth="1000.0" stylesheets="@dark-mode.css">
             <columns>
-                <TableColumn fx:id="id" text="ID" />
                 <TableColumn fx:id="nombre" text="Nombre" />
                 <TableColumn fx:id="descripcion" text="Descripción" />
                 <TableColumn fx:id="lugar" text="Lugar" />
                 <TableColumn fx:id="fecha_inicio" text="Inicio" />
                 <TableColumn fx:id="fecha_fin" text="Fin" />
-                <TableColumn fx:id="nombre_categoria" text="Categoria" />
-            <TableColumn fx:id="acciones" maxWidth="150" minWidth="100" prefWidth="100" />
+<TableColumn fx:id="nombre_categoria" text="Categoría (seleccionar)" prefWidth="150.0" />            <TableColumn fx:id="acciones" maxWidth="150" minWidth="100" prefWidth="100" />
             </columns>
         </TableView>
         <!-- Contenedor para los botones -->
