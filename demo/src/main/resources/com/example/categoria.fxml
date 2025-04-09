@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="1000.0" spacing="10" style="-fx-background-color: #111111;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.CategoriaController">
+<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="1000.0" spacing="10" style="-fx-background-color: #111111;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.CategoriaController">
     <children>
      <HBox fx:id="barraTitulo" alignment="CENTER_RIGHT" prefHeight="30.0" spacing="10" style="-fx-background-color: #111111;">
     <children>
@@ -16,11 +16,11 @@
         <Button onAction="#cerrarVentana" style="-fx-background-color: #111111; -fx-text-fill: white;" text="✖" />
     </children>
 </HBox>
-        <Label prefHeight="67.0" prefWidth="280.0" style="-fx-font-size: 24px; -fx-font-weight: bold; " text="GESTIONAR EVENTOS" textFill="WHITE" />
+        <Label prefHeight="65.0" prefWidth="149.0" style="-fx-font-size: 24px; -fx-font-weight: bold; " text="CATEGORIAS" textFill="WHITE" />
         <fx:include source="botones.fxml" />
         <TableView fx:id="tableView" prefHeight="367.0" prefWidth="1000.0" stylesheets="@dark-mode.css">
             <columns>
-                <TableColumn fx:id="nombre" prefWidth="97.0" text="Nombre" maxWidth="150"/>
+                <TableColumn fx:id="nombre" maxWidth="150" prefWidth="97.0" text="Nombre" />
                 <TableColumn fx:id="descripcion" prefWidth="174.0" text="Descripción" />
                 <TableColumn fx:id="acciones" maxWidth="150" minWidth="100" prefWidth="100" />
             

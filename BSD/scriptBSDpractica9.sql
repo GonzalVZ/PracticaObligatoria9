@@ -62,106 +62,44 @@ CREATE TABLE artista (
 );
 
 -- -----------------------------------------------------------------------
--- DATOS DE PRUEBA
+-- INSERCIONES DE PRUEBA
 -- -----------------------------------------------------------------------
 
--- Inserción de categorías
--- Inserción de categorías
-INSERT INTO categoria (id, nombre, descripcion) VALUES
-(1, 'Exposición', 'Exhibición de obras artísticas'),
-(2, 'Concierto', 'Eventos musicales en vivo'),
-(3, 'Cine', 'Proyecciones y festivales de cine'),
-(4, 'Tecnología', 'Eventos relacionados con avances tecnológicos y conferencias');
+-- Insertar datos en la tabla "categoria"
+INSERT INTO categoria (nombre, descripcion) VALUES
+('Festival de música', 'Evento musical al aire libre con diversos géneros.'),
+('Conferencia de tecnología', 'Reunión de expertos en innovación tecnológica.'),
+('Exposición de arte', 'Muestra de obras de arte contemporáneo y clásico.');
 
--- Inserción de eventos
-INSERT INTO evento (id, nombre, descripcion, lugar, fecha_inicio, fecha_fin, id_categoria) VALUES
-(1, 'Exposición de Arte Moderno', 'Muestra de arte contemporáneo', 'Galería Central', '2023-10-15', '2023-11-15', 1),
-(2, 'Concierto de Verano', 'Festival musical al aire libre', 'Parque Municipal', '2023-08-20', '2023-08-22', 2),
-(3, 'Festival de Cine', 'Proyección de películas independientes', 'Cinepolis Centro', '2023-12-05', '2023-12-10', 3),
-(4, 'Conferencia de Tecnología', 'Avances en inteligencia artificial', 'Centro de Convenciones', '2023-11-20', '2023-11-21', 4);
+-- Insertar datos en la tabla "evento"
+INSERT INTO evento (nombre, descripcion, lugar, fecha_inicio, fecha_fin, id_categoria) VALUES
+('Rock en vivo', 'Concierto de bandas de rock con ambiente festivo.', 'Madrid', '2023-05-20', '2023-05-21', 1),
+('Tech Summit 2023', 'Conferencia con líderes del sector tecnológico.', 'Barcelona', '2023-06-15', '2023-06-17', 2),
+('Galería Abierta', 'Exposición de pinturas, esculturas y fotografías.', 'Valencia', '2023-07-10', '2023-07-12', 3);
 
--- Inserción de personas
-INSERT INTO persona (id, nombre, apellido1, apellido2) VALUES
-(1, 'Ana', 'García', 'Ramírez'),
-(2, 'Pedro', 'Sánchez', 'Morales'),
-(3, 'Lucía', 'Fernández', 'Torres'),
-(4, 'Javier', 'Hernández', 'López'),
-(5, 'Sofía', 'Martín', 'González'),
-(6, 'Carlos', 'Rodríguez', 'Pérez'),
-(7, 'María', 'López', 'Gómez');
+-- Insertar datos en la tabla "persona"
+INSERT INTO persona (nombre, apellido1, apellido2) VALUES
+('Juan', 'Pérez', 'Gómez'),
+('María', 'López', 'Sánchez'),
+('Carlos', 'Martínez', 'Ruiz');
 
--- Inserción de participantes
+-- Insertar datos en la tabla "participante"
 INSERT INTO participante (id_persona, email) VALUES
-(1, 'ana.garcia@example.com'),
-(2, 'pedro.sanchez@example.com'),
-(5, 'sofia.martin@example.com'),
-(7, 'maria.lopez@example.com');
+(1, 'juan.perez@example.com'),
+(2, 'maria.lopez@example.com'),
+(3, 'carlos.martinez@example.com');
 
--- Inserción de artistas
+-- Insertar datos en la tabla "artista"
 INSERT INTO artista (id_persona, fotografia, obra_destacada) VALUES
-(3, 'lucia_foto.jpg', 'Retrato al óleo'),
-(4, 'javier_foto.jpg', 'Instalación interactiva'),
-(6, 'carlos_foto.jpg', 'Escultura en metal');
+(1, 'juan_foto.jpg', 'Instalación interactiva "Conexiones"'),
+(2, 'maria_foto.jpg', 'Pintura al óleo "Sueño Abstracto"'),
+(3, 'carlos_foto.jpg', 'Fotografía creativa "Luz y Sombra"');
 
--- Inserción de participaciones
+-- Insertar datos en la tabla "participa"
+-- Se relacionan los eventos con las personas
 INSERT INTO participa (id_evento, id_persona, fecha) VALUES
-(1, 1, '2023-10-15'), -- Ana participa en la Exposición
-(1, 3, '2023-10-16'), -- Lucía participa en la Exposición
-(2, 4, '2023-08-20'), -- Javier participa en el Concierto
-(2, 6, '2023-08-21'), -- Carlos participa en el Concierto
-(3, 1, '2023-12-05'), -- Ana participa en el Festival de Cine
-(3, 2, '2023-12-05'), -- Pedro participa en el Festival de Cine
-(3, 3, '2023-12-06'), -- Lucía participa en el Festival de Cine
-(4, 4, '2023-11-20'), -- Javier participa en la Conferencia de Tecnología
-(4, 5, '2023-11-20'), -- Sofía participa en la Conferencia de Tecnología
-(4, 7, '2023-11-21'); -- María participa en la Conferencia de Tecnología
--- -----------------------------------------------------------------------
--- CONSULTAS DE VERIFICACIÓN
--- -----------------------------------------------------------------------
+(1, 1, '2023-05-20'),
+(2, 2, '2023-06-15'),
+(3, 3, '2023-07-10');
 
--- Consulta JOIN para mostrar participantes con sus eventos
-SELECT 
-    persona.id,
-    persona.nombre,
-    persona.apellido1,
-    persona.apellido2,
-    participante.email,
-    participa.fecha,
-    evento.nombre AS evento_nombre,
-    evento.descripcion AS evento_descripcion,
-    evento.lugar,
-    evento.fecha_inicio,
-    evento.fecha_fin 
-FROM participa 
-INNER JOIN evento ON participa.id_evento = evento.id 
-INNER JOIN persona ON participa.id_persona = persona.id 
-INNER JOIN participante ON participante.id_persona = persona.id;
-
--- Consulta JOIN para mostrar artistas con sus eventos
-SELECT 
-    persona.id,
-    persona.nombre,
-    persona.apellido1,
-    persona.apellido2,
-    artista.fotografia,
-    artista.obra_destacada,
-    participa.fecha,
-    evento.nombre AS evento_nombre 
-FROM participa 
-INNER JOIN evento ON participa.id_evento = evento.id 
-INNER JOIN persona ON participa.id_persona = persona.id 
-INNER JOIN artista ON artista.id_persona = persona.id;
-
--- Mostrar todos los participantes
-SELECT 
-    persona.*,
-    participante.* 
-FROM persona  
-INNER JOIN participante ON participante.id_persona = persona.id;
-
--- Mostrar todos los artistas
-SELECT 
-    persona.*,
-    artista.* 
-FROM persona  
-INNER JOIN artista ON artista.id_persona = persona.id;
+-- FIN DEL SCRIPT DE PRUEBA

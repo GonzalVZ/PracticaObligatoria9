@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.geometry.Insets?>
 
-<VBox alignment="TOP_CENTER" prefHeight="831.0" prefWidth="1418.0" spacing="10" style="-fx-background-color: #111111;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.ParticipanteController">
+<VBox alignment="TOP_CENTER" prefHeight="831.0" prefWidth="1418.0" spacing="10" style="-fx-background-color: #111111;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.ParticipanteController">
     <children>
         <HBox fx:id="barraTitulo" alignment="CENTER_RIGHT" prefHeight="30.0" spacing="10" style="-fx-background-color: #111111;">
             <children>
@@ -17,7 +17,7 @@
                 <Button onAction="#cerrarVentana" style="-fx-background-color: #111111; -fx-text-fill: white;" text="✖" />
             </children>
         </HBox>
-        <Label prefHeight="27.0" prefWidth="382.0" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="GESTIONAR PARTICIPANTES" textFill="WHITE" />
+        <Label prefHeight="35.0" prefWidth="185.0" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="PARTICIPANTES" textFill="WHITE" />
 
         <!-- Incluir botones de navegación -->
         <fx:include source="botones.fxml" />
@@ -31,7 +31,7 @@
                 <!-- Columna de Participante -->
                 <TableColumn fx:id="email" text="Email" />
                 <!-- Columna de acciones -->
-                <TableColumn fx:id="accionesParticipante" text="Acciones" prefWidth="120.0" />
+                <TableColumn fx:id="accionesParticipante" prefWidth="120.0" text="Acciones" />
             </columns>
         </TableView>
         <VBox spacing="5">
@@ -40,12 +40,20 @@
             <HBox fx:id="hboxEventosDisponibles" alignment="CENTER" spacing="10" visible="false">
                <children>
                   <Label text="No hay eventos asignados a este participante" textFill="white" />
-                  <Button fx:id="btnMostrarEventosDisponibles" onAction="#mostrarEventosDisponibles" 
-                         style="-fx-background-color: #4CAF50; -fx-text-fill: white;" 
-                         text="Ver eventos disponibles" />
+                  <Button fx:id="btnMostrarEventosDisponibles" onAction="#mostrarEventosDisponibles" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Ver eventos disponibles" />
                </children>
                <padding>
-                  <Insets top="10" bottom="10" />
+                  <Insets bottom="10" top="10" />
+               </padding>
+            </HBox>
+            
+            <!-- Nueva barra de herramientas con botón para añadir eventos -->
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+               <children>
+                  <Button fx:id="btnAnadirEvento" onAction="#mostrarEventosDisponibles" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="➕ Añadir evento" />
+               </children>
+               <padding>
+                  <Insets bottom="5" top="5" />
                </padding>
             </HBox>
             

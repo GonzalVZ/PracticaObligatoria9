@@ -31,67 +31,179 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 /**
- * Controlador para la gestión de artistas.
- * Implementa la funcionalidad de listar, agregar, modificar y eliminar artistas,
- * así como asignar eventos mediante la tabla participa.
+ * Controlador para la gestión de artistas en la aplicación.
+ * Permite ver, crear, editar y eliminar artistas, así como gestionar
+ * sus relaciones con eventos mediante la tabla participa.
+ * 
+ * <p>Este controlador maneja dos tablas principales:
+ * <ul>
+ *   <li>Una tabla de artistas que muestra los datos básicos de cada artista</li>
+ *   <li>Una tabla de eventos que muestra los eventos asociados al artista seleccionado</li>
+ * </ul>
+ * </p>
+ * 
+ * @author Jesús
+ * @version 1.0
  */
 public class ArtistaController {
 
-    // Controles de interfaz
+    //--------------------------------------------------
+    // CONTROLES DE INTERFAZ
+    //--------------------------------------------------
+    /**
+     * Barra de título personalizada para mover la ventana.
+     */
     @FXML
     private HBox barraTitulo;
     private double xOffset = 0;
     private double yOffset = 0;
     
+    /**
+     * Tabla principal que muestra la lista de artistas.
+     */
     @FXML
     private TableView<Artista> tableView;
+    
+    /**
+     * Columna para el nombre del artista.
+     */
     @FXML
-    private TableColumn<Artista, String> nombre;       // persona.nombre
+    private TableColumn<Artista, String> nombre;
+    
+    /**
+     * Columna para el primer apellido del artista.
+     */
     @FXML
-    private TableColumn<Artista, String> apellido1;    // persona.apellido1
+    private TableColumn<Artista, String> apellido1;
+    
+    /**
+     * Columna para el segundo apellido del artista.
+     */
     @FXML
-    private TableColumn<Artista, String> apellido2;    // persona.apellido2
+    private TableColumn<Artista, String> apellido2;
+    
+    /**
+     * Columna para la fotografía del artista.
+     */
     @FXML
-    private TableColumn<Artista, String> fotografia;   // artista.fotografia
+    private TableColumn<Artista, String> fotografia;
+    
+    /**
+     * Columna para la obra destacada del artista.
+     */
     @FXML
-    private TableColumn<Artista, String> obraDestacada;  // artista.obra_destacada
+    private TableColumn<Artista, String> obraDestacada;
+    
+    /**
+     * Columna para botones de acción (guardar, eliminar, ver eventos).
+     */
     @FXML
     private TableColumn<Artista, Void> accionesArtista;
     
-    // Tabla para los eventos asociados al artista
+    //--------------------------------------------------
+    // TABLA DE EVENTOS (DETALLE)
+    //--------------------------------------------------
+    /**
+     * Tabla que muestra los eventos asociados al artista seleccionado.
+     */
     @FXML
     private TableView<Evento> tableView1;
+    
+    /**
+     * Columna para el nombre del evento.
+     */
     @FXML
-    private TableColumn<Evento, String> colEvNombre;      // evento.nombre
+    private TableColumn<Evento, String> colEvNombre;
+    
+    /**
+     * Columna para la descripción del evento.
+     */
     @FXML
-    private TableColumn<Evento, String> colEvDescripcion; // evento.descripcion
+    private TableColumn<Evento, String> colEvDescripcion;
+    
+    /**
+     * Columna para el lugar del evento.
+     */
     @FXML
-    private TableColumn<Evento, String> colEvLugar;       // evento.lugar
+    private TableColumn<Evento, String> colEvLugar;
+    
+    /**
+     * Columna para la fecha de inicio del evento.
+     */
     @FXML
-    private TableColumn<Evento, String> colEvFechaInicio; // evento.fecha_inicio
+    private TableColumn<Evento, String> colEvFechaInicio;
+    
+    /**
+     * Columna para la fecha de fin del evento.
+     */
     @FXML
-    private TableColumn<Evento, String> colEvFechaFin;    // evento.fecha_fin
+    private TableColumn<Evento, String> colEvFechaFin;
+    
+    /**
+     * Columna para la fecha de actuación del artista en el evento.
+     */
     @FXML
-    private TableColumn<Evento, String> colFechaActuacion; // fecha de actuación
+    private TableColumn<Evento, String> colFechaActuacion;
+    
+    /**
+     * Columna para botones de acción de eventos (añadir, quitar).
+     */
     @FXML
     private TableColumn<Evento, Void> colAcciones;
     
+    /**
+     * Panel para mostrar mensaje cuando no hay eventos asignados.
+     */
     @FXML
     private HBox hboxEventosDisponibles;
+    
+    /**
+     * Botón para alternar entre eventos asignados y disponibles.
+     */
     @FXML
     private Button btnMostrarEventosDisponibles;
     
-    // Listas de datos
+    /**
+     * Botón para añadir eventos explícitamente.
+     */
+    @FXML
+    private Button btnAnadirEvento;
+    
+    //--------------------------------------------------
+    // COLECCIONES DE DATOS
+    //--------------------------------------------------
+    /**
+     * Lista observable de todos los artistas mostrados en la tabla principal.
+     */
     private ObservableList<Artista> listaArtistas = FXCollections.observableArrayList();
+    
+    /**
+     * Lista observable de eventos asociados al artista seleccionado.
+     */
     private ObservableList<Evento> listaEventosArtista = FXCollections.observableArrayList();
     
-    // Mapa para nombres de eventos
+    /**
+     * Mapa para relacionar nombres de eventos con objetos Evento.
+     */
     private Map<String, Evento> eventosMap = new HashMap<>();
+    
+    /**
+     * Lista de nombres de eventos para el ComboBox.
+     */
     private ObservableList<String> nombresEventos = FXCollections.observableArrayList();
     
+    /**
+     * Flag para controlar si se están mostrando eventos disponibles o asignados.
+     */
     private boolean mostrandoEventosDisponibles = false;
     
-    // Inicialización de la vista
+    //--------------------------------------------------
+    // INICIALIZACIÓN
+    //--------------------------------------------------
+    /**
+     * Método de inicialización que se ejecuta al cargar la vista.
+     * Configura las tablas, columnas, carga los datos iniciales y establece los listeners.
+     */
     public void initialize() {
         cargarEventos();
         configurarColumnas();
@@ -101,12 +213,19 @@ public class ArtistaController {
         tableView.setItems(listaArtistas);
         tableView1.setItems(listaEventosArtista);
         tableView1.setVisible(false);
-        if(hboxEventosDisponibles!=null) {
+        if(hboxEventosDisponibles != null) {
             hboxEventosDisponibles.setVisible(false);
         }
         loadData();
     }
     
+    //--------------------------------------------------
+    // CONFIGURACIÓN DE COLUMNAS Y CELDAS
+    //--------------------------------------------------
+    /**
+     * Configura las columnas de ambas tablas, establece sus propiedades, fábricas de celdas
+     * y manejadores de eventos.
+     */
     private void configurarColumnas() {
         // Columnas de la tabla de artistas
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
@@ -115,7 +234,7 @@ public class ArtistaController {
         fotografia.setCellValueFactory(new PropertyValueFactory<>("fotografia"));
         obraDestacada.setCellValueFactory(new PropertyValueFactory<>("obraDestacada"));
         
-        // Editables
+        // Hacer editables las columnas de artistas
         nombre.setCellFactory(TextFieldTableCell.forTableColumn());
         apellido1.setCellFactory(TextFieldTableCell.forTableColumn());
         apellido2.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -130,7 +249,7 @@ public class ArtistaController {
         colEvFechaFin.setCellValueFactory(new PropertyValueFactory<>("fecha_fin"));
         colFechaActuacion.setCellValueFactory(new PropertyValueFactory<>("fechaActuacion"));
         
-        // ComboBox en columna de nombre de evento
+        // ComboBox en columna de nombre de evento para permitir cambios
         colEvNombre.setCellFactory(column -> {
             ComboBoxTableCell<Evento, String> cell = new ComboBoxTableCell<>(nombresEventos) {
                 {
@@ -143,6 +262,7 @@ public class ArtistaController {
                         setText(null);
                         setGraphic(null);
                     } else {
+                        // Crear un contenedor para el texto y el indicador de desplegable
                         HBox content = new HBox(5);
                         content.setAlignment(Pos.CENTER_LEFT);
                         Label texto = new Label(item);
@@ -184,7 +304,7 @@ public class ArtistaController {
             }
         });
         
-        // Columna de acciones para artistas
+        // Configurar columna de acciones para la tabla de artistas
         accionesArtista.setCellFactory(new Callback<TableColumn<Artista, Void>, TableCell<Artista, Void>>() {
             @Override
             public TableCell<Artista, Void> call(final TableColumn<Artista, Void> param) {
@@ -243,7 +363,7 @@ public class ArtistaController {
             }
         });
         
-        // Columna de acciones para la tabla de eventos
+        // Configurar columna de acciones para la tabla de eventos
         colAcciones.setCellFactory(new Callback<TableColumn<Evento, Void>, TableCell<Evento, Void>>() {
             @Override
             public TableCell<Evento, Void> call(final TableColumn<Evento, Void> param) {
@@ -307,33 +427,79 @@ public class ArtistaController {
             }
         });
         
+        // Configurar políticas de redimensionamiento de columnas
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableView1.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
     
+    //--------------------------------------------------
+    // OPERACIONES DE RELACIÓN ARTISTA-EVENTO
+    //--------------------------------------------------
+    /**
+     * Asigna un artista a un evento mediante la creación de un registro en la tabla participa.
+     * 
+     * @param a El artista a asignar
+     * @param e El evento al que se asignará el artista
+     */
     private void asignarArtistaAEvento(Artista a, Evento e) {
         String fecha = java.time.LocalDate.now().toString();
         try(Connection con = Conexion.conectarBD();
             PreparedStatement ps = con.prepareStatement("INSERT INTO participa (id_persona, id_evento, fecha) VALUES (?, ?, ?)")){
+            
+            if (con == null) {
+                showAlert(AlertType.ERROR, "Error de conexión", "No se pudo establecer conexión con la base de datos");
+                return;
+            }
+            
             ps.setInt(1, a.getId());
             ps.setInt(2, e.getId());
             ps.setString(3, fecha);
             int res = ps.executeUpdate();
             if(res>0){
                 showAlert(AlertType.INFORMATION, "Asignación", "Artista asignado al evento correctamente");
+                // Recargar los eventos del artista
                 cargarEventosDelArtista(a.getId());
+                
+                // Asegurar que se muestra la vista correcta después de asignar
+                if(mostrandoEventosDisponibles) {
+                    // Recargar los eventos disponibles para quitar el que acabamos de asignar
+                    cargarEventosDisponibles(a.getId());
+                } else {
+                    // Asegurar que se muestran los eventos asignados
+                    cargarEventosDelArtista(a.getId());
+                }
+                
+                // Asegurar que la tabla está visible
+                tableView1.setVisible(true);
             } else {
                 showAlert(AlertType.ERROR, "Error", "No se pudo asignar al artista al evento");
             }
         } catch(Exception ex){
-            showAlert(AlertType.ERROR, "Error", "Error al asignar: " + ex.getMessage());
-            ex.printStackTrace();
+            // Manejo específico para violación de clave primaria (evento ya asignado)
+            if (ex.getMessage().contains("Duplicate entry") || ex.getMessage().contains("PRIMARY")) {
+                showAlert(AlertType.ERROR, "Error", "Este artista ya está asignado a este evento");
+            } else {
+                showAlert(AlertType.ERROR, "Error", "Error al asignar: " + ex.getMessage());
+                ex.printStackTrace();
+            }
         }
     }
     
+    /**
+     * Elimina la asignación de un artista a un evento, borrando el registro de la tabla participa.
+     * 
+     * @param a El artista a desvincular
+     * @param e El evento del que se desvinculará
+     */
     private void quitarArtistaDeEvento(Artista a, Evento e) {
         try(Connection con = Conexion.conectarBD();
             PreparedStatement ps = con.prepareStatement("DELETE FROM participa WHERE id_persona = ? AND id_evento = ?")){
+            
+            if (con == null) {
+                showAlert(AlertType.ERROR, "Error de conexión", "No se pudo establecer conexión con la base de datos");
+                return;
+            }
+            
             ps.setInt(1, a.getId());
             ps.setInt(2, e.getId());
             int res = ps.executeUpdate();
@@ -349,6 +515,13 @@ public class ArtistaController {
         }
     }
     
+    //--------------------------------------------------
+    // CARGA DE DATOS Y EVENTOS
+    //--------------------------------------------------
+    /**
+     * Carga todos los eventos disponibles en la base de datos para
+     * su uso en los ComboBox y otras operaciones.
+     */
     private void cargarEventos() {
         ObservableList<Evento> listaEventos = FXCollections.observableArrayList();
         Evento.getAll(listaEventos);
@@ -361,9 +534,22 @@ public class ArtistaController {
         }
     }
     
+    /**
+     * Carga los eventos asociados a un artista específico y actualiza
+     * la interfaz según corresponda.
+     * 
+     * @param artistaId ID del artista cuyos eventos se cargarán
+     */
     private void cargarEventosDelArtista(int artistaId) {
         listaEventosArtista.clear();
-        Artista.getEventosForArtista(artistaId, listaEventosArtista);
+        
+        try {
+            Artista.getEventosForArtista(artistaId, listaEventosArtista);
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", "No se pudieron cargar los eventos del artista: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
         boolean tieneEventos = !listaEventosArtista.isEmpty();
         if(hboxEventosDisponibles != null) {
             hboxEventosDisponibles.setVisible(!tieneEventos && tableView1.isVisible());
@@ -372,6 +558,10 @@ public class ArtistaController {
         tableView1.refresh();
     }
     
+    /**
+     * Muestra los eventos disponibles para el artista seleccionado
+     * (aquellos en los que no participa actualmente).
+     */
     @FXML
     public void mostrarEventosDisponibles() {
         Artista artista = tableView.getSelectionModel().getSelectedItem();
@@ -381,24 +571,38 @@ public class ArtistaController {
                 if(btnMostrarEventosDisponibles != null)
                     btnMostrarEventosDisponibles.setText("Volver a eventos asignados");
                 cargarEventosDisponibles(artista.getId());
-                if(hboxEventosDisponibles != null)
-                    hboxEventosDisponibles.setVisible(false);
             } else {
                 if(btnMostrarEventosDisponibles != null)
                     btnMostrarEventosDisponibles.setText("Ver eventos disponibles");
                 cargarEventosDelArtista(artista.getId());
-                if(hboxEventosDisponibles != null && listaEventosArtista.isEmpty())
-                    hboxEventosDisponibles.setVisible(true);
             }
+            
+            // Asegurar que la tabla de eventos es visible
+            tableView1.setVisible(true);
+        } else {
+            showAlert(AlertType.WARNING, "Selección", "Debe seleccionar un artista primero");
         }
     }
     
+    /**
+     * Carga los eventos en los que el artista no participa actualmente
+     * para permitir su asignación.
+     * 
+     * @param artistaId ID del artista para el que se cargarán eventos disponibles
+     */
     private void cargarEventosDisponibles(int artistaId) {
         listaEventosArtista.clear();
         try(Connection con = Conexion.conectarBD();
             PreparedStatement ps = con.prepareStatement(
+                // Consulta para mostrar solo eventos NO asignados al artista
                 "SELECT e.* FROM evento e WHERE e.id NOT IN (SELECT id_evento FROM participa WHERE id_persona = ?)"
             )){
+            
+            if (con == null) {
+                showAlert(AlertType.ERROR, "Error de conexión", "No se pudo establecer conexión con la base de datos");
+                return;
+            }
+            
             ps.setInt(1, artistaId);
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
@@ -410,16 +614,36 @@ public class ArtistaController {
                 String fecha_fin = rs.getString("fecha_fin");
                 int id_categoria = rs.getInt("id_categoria");
                 Evento evento = new Evento(id, nom, descripcion, lugar, fecha_inicio, fecha_fin, id_categoria);
-                evento.setFechaActuacion("");
+                evento.setFechaActuacion(""); // Marca como evento no asignado
                 listaEventosArtista.add(evento);
             }
+            
+            // Mostrar mensaje si no hay eventos disponibles
+            if (listaEventosArtista.isEmpty() && hboxEventosDisponibles != null) {
+                // Modificar el mensaje para indicar que no hay eventos disponibles
+                Label lblNoEventos = new Label("No hay más eventos disponibles para asignar");
+                lblNoEventos.setTextFill(javafx.scene.paint.Color.WHITE);
+                hboxEventosDisponibles.getChildren().clear();
+                hboxEventosDisponibles.getChildren().add(lblNoEventos);
+                hboxEventosDisponibles.setVisible(true);
+            } else if (hboxEventosDisponibles != null) {
+                hboxEventosDisponibles.setVisible(false);
+            }
+            
         } catch(Exception e){
+            showAlert(AlertType.ERROR, "Error", "Error al cargar eventos disponibles: " + e.getMessage());
             System.out.println("Error al cargar eventos disponibles: " + e.getMessage());
             e.printStackTrace();
         }
         tableView1.refresh();
     }
     
+    //--------------------------------------------------
+    // CONFIGURACIÓN DE LA INTERFAZ
+    //--------------------------------------------------
+    /**
+     * Configura el comportamiento para mover la ventana arrastrando la barra de título.
+     */
     private void configurarMovimientoVentana() {
         barraTitulo.setOnMousePressed(event -> {
             Stage stage = (Stage) barraTitulo.getScene().getWindow();
@@ -433,22 +657,44 @@ public class ArtistaController {
         });
     }
     
+    /**
+     * Configura los listeners para la selección y edición de artistas.
+     */
     private void configurarSeleccionYEdicion() {
+        // Listener para cuando se selecciona un artista
         tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if(newSelection != null){
                 cargarEventosDelArtista(newSelection.getId());
             }
             tableView.refresh();
         });
+        
+        // Hacer editables las tablas
         tableView.setEditable(true);
         tableView1.setEditable(true);
     }
     
+    //--------------------------------------------------
+    // MÉTODOS CRUD PARA ARTISTAS
+    //--------------------------------------------------
+    /**
+     * Carga todos los artistas desde la base de datos.
+     */
     private void loadData() {
-        listaArtistas.clear();
-        Artista.getAll(listaArtistas);
+        try {
+            listaArtistas.clear();
+            Artista.getAll(listaArtistas);
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", "No se pudieron cargar los datos de artistas: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
+    /**
+     * Añade una nueva fila vacía a la tabla de artistas para permitir la creación.
+     * 
+     * @throws IOException Si ocurre algún error de entrada/salida
+     */
     @FXML
     public void addRow() throws IOException {
         Artista nuevo = new Artista(0, "", "", "", "", "");
@@ -457,23 +703,37 @@ public class ArtistaController {
         tableView.edit(tableView.getSelectionModel().getSelectedIndex(), nombre);
     }
     
+    /**
+     * Guarda los cambios realizados a un artista en la base de datos.
+     * 
+     * @param a El artista a guardar o actualizar
+     */
     public void saveRow(Artista a) {
-        int res = a.save();
-        if(res > 0) {
-            showAlert(AlertType.INFORMATION, "Guardado", "Artista guardado correctamente.");
-            loadData();
-            for(Artista art : listaArtistas) {
-                if(art.getId() == a.getId()){
-                    tableView.getSelectionModel().select(art);
-                    cargarEventosDelArtista(a.getId());
-                    break;
+        try {
+            int res = a.save();
+            if(res > 0) {
+                showAlert(AlertType.INFORMATION, "Guardado", "Artista guardado correctamente.");
+                loadData();
+                for(Artista art : listaArtistas) {
+                    if(art.getId() == a.getId()){
+                        tableView.getSelectionModel().select(art);
+                        cargarEventosDelArtista(a.getId());
+                        break;
+                    }
                 }
+            } else {
+                showAlert(AlertType.ERROR, "Error", "No se pudo guardar el artista.");
             }
-        } else {
-            showAlert(AlertType.ERROR, "Error", "No se pudo guardar el artista.");
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", "Error al guardar el artista: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
+    /**
+     * Elimina el artista seleccionado de la base de datos,
+     * previa confirmación del usuario.
+     */
     @FXML
     public void deleteRow() {
         Artista a = tableView.getSelectionModel().getSelectedItem();
@@ -487,25 +747,43 @@ public class ArtistaController {
         alert.setContentText("Esta acción no se puede deshacer.");
         Optional<ButtonType> result = alert.showAndWait();
         if(result.isPresent() && result.get() == ButtonType.OK){
-            int rows = a.delete(a.getId());
-            if(rows > 0){
-                listaArtistas.remove(a);
-                tableView1.setVisible(false);
-                if(hboxEventosDisponibles != null)
-                    hboxEventosDisponibles.setVisible(false);
-                showAlert(AlertType.INFORMATION, "Eliminado", "Artista eliminado correctamente.");
-            } else {
-                showAlert(AlertType.ERROR, "Error", "No se pudo eliminar el artista.");
+            try {
+                int rows = a.delete(a.getId());
+                if(rows > 0){
+                    listaArtistas.remove(a);
+                    tableView1.setVisible(false);
+                    if(hboxEventosDisponibles != null)
+                        hboxEventosDisponibles.setVisible(false);
+                    showAlert(AlertType.INFORMATION, "Eliminado", "Artista eliminado correctamente.");
+                } else {
+                    showAlert(AlertType.ERROR, "Error", "No se pudo eliminar el artista.");
+                }
+            } catch (Exception e) {
+                showAlert(AlertType.ERROR, "Error", "Error al eliminar el artista: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
     
+    //--------------------------------------------------
+    // CONTROL DE VENTANA
+    //--------------------------------------------------
+    /**
+     * Minimiza la ventana de la aplicación.
+     * 
+     * @param event El evento que desencadenó esta acción
+     */
     @FXML
     private void minimizarVentana(ActionEvent event) {
         Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         stage.setIconified(true);
     }
     
+    /**
+     * Maximiza o restaura la ventana de la aplicación.
+     * 
+     * @param event El evento que desencadenó esta acción
+     */
     @FXML
     private void maximizarVentana(ActionEvent event) {
         Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
@@ -516,12 +794,27 @@ public class ArtistaController {
         }
     }
     
+    /**
+     * Cierra la ventana de la aplicación.
+     * 
+     * @param event El evento que desencadenó esta acción
+     */
     @FXML
     private void cerrarVentana(ActionEvent event) {
         Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         stage.close();
     }
     
+    //--------------------------------------------------
+    // UTILIDADES
+    //--------------------------------------------------
+    /**
+     * Muestra un diálogo de alerta con el tipo, título y mensaje especificados.
+     * 
+     * @param type El tipo de alerta (información, error, etc.)
+     * @param title El título del diálogo
+     * @param message El mensaje a mostrar
+     */
     private void showAlert(AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

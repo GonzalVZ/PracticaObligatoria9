@@ -3,33 +3,84 @@ package com.example;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
+import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 /**
- * Clase que representa un participante en el sistema.
- * Hereda de Persona (con id, nombre, apellido1 y apellido2) y añade la propiedad email
- * y datos adicionales obtenidos de la tabla participa y evento.
+ * Clase que representa un participante en el sistema de gestión de eventos.
+ * Hereda de {@link Persona} e incluye atributos específicos como el email y
+ * relaciones con los eventos en los que participa.
+ * 
+ * <p>Esta clase implementa operaciones CRUD (Crear, Leer, Actualizar, Eliminar)
+ * para trabajar con datos de participantes en la base de datos, además de métodos
+ * para gestionar su relación con eventos.</p>
+ * 
+ * @author Jesús
+ * @version 1.0
+ * @see Persona
+ * @see Evento
  */
 public class Participante extends Persona {
 
+    //--------------------------------------------------
+    // PROPIEDADES
+    //--------------------------------------------------
+    /**
+     * Email de contacto del participante.
+     */
     private StringProperty email;
+    
+    /**
+     * Fecha en la que el participante se registró para un evento específico.
+     */
     private StringProperty participaFecha;
+    
+    /**
+     * Nombre del evento en el que participa (para consultas de join).
+     */
     private StringProperty evNombre;
+    
+    /**
+     * Descripción del evento en el que participa (para consultas de join).
+     */
     private StringProperty evDescripcion;
+    
+    /**
+     * Lugar del evento en el que participa (para consultas de join).
+     */
     private StringProperty evLugar;
+    
+    /**
+     * Fecha de inicio del evento en el que participa (para consultas de join).
+     */
     private StringProperty evFechaInicio;
+    
+    /**
+     * Fecha de fin del evento en el que participa (para consultas de join).
+     */
     private StringProperty evFechaFin;
+    
+    /**
+     * ID del evento en el que participa (para operaciones de base de datos).
+     */
     private IntegerProperty eventoId;
 
+    //--------------------------------------------------
+    // CONSTRUCTORES
+    //--------------------------------------------------
     /**
-     * Constructor simple (solo para guardar desde formularios, sin los datos de join).
+     * Constructor simple para crear un participante básico.
+     * Utilizado principalmente para formularios de creación y edición.
      * 
      * @param id ID del participante
      * @param nombre Nombre del participante
@@ -50,7 +101,8 @@ public class Participante extends Persona {
     }
 
     /**
-     * Constructor que incluye campos del join para la consulta.
+     * Constructor para participante con fecha de participación.
+     * Utilizado cuando se recuperan participantes con su fecha de participación.
      * 
      * @param id ID del participante
      * @param per_nombre Nombre del participante
@@ -73,7 +125,8 @@ public class Participante extends Persona {
     }
 
     /**
-     * Constructor completo con todos los campos incluidos los de evento.
+     * Constructor completo con todos los datos de participante y evento.
+     * Utilizado cuando se recuperan participantes junto con sus eventos asociados.
      * 
      * @param id ID del participante
      * @param per_nombre Nombre del participante
@@ -102,9 +155,12 @@ public class Participante extends Persona {
         this.eventoId = new SimpleIntegerProperty(eventoId);
     }
 
-    // Propiedades para JavaFX
+    //--------------------------------------------------
+    // PROPIEDADES JAVAFX
+    //--------------------------------------------------
     /**
-     * Obtiene la propiedad del ID del evento.
+     * Obtiene la propiedad del ID del evento para uso en JavaFX.
+     * 
      * @return La propiedad ID del evento como IntegerProperty
      */
     public IntegerProperty eventoIdProperty() {
@@ -113,6 +169,7 @@ public class Participante extends Persona {
     
     /**
      * Obtiene el ID del evento.
+     * 
      * @return El ID del evento como entero
      */
     public int getEventoId() {
@@ -121,6 +178,7 @@ public class Participante extends Persona {
     
     /**
      * Establece el ID del evento.
+     * 
      * @param id El nuevo ID del evento
      */
     public void setEventoId(int id) {
@@ -128,7 +186,8 @@ public class Participante extends Persona {
     }
 
     /**
-     * Obtiene la propiedad del email.
+     * Obtiene la propiedad del email para uso en JavaFX.
+     * 
      * @return La propiedad email como StringProperty
      */
     public StringProperty emailProperty() {
@@ -137,6 +196,7 @@ public class Participante extends Persona {
     
     /**
      * Obtiene el email del participante.
+     * 
      * @return El email como String
      */
     public String getEmail() {
@@ -145,6 +205,7 @@ public class Participante extends Persona {
     
     /**
      * Establece el email del participante.
+     * 
      * @param email El nuevo email
      */
     public void setEmail(String email) {
@@ -152,7 +213,8 @@ public class Participante extends Persona {
     }
 
     /**
-     * Obtiene la propiedad de la fecha de participación.
+     * Obtiene la propiedad de la fecha de participación para uso en JavaFX.
+     * 
      * @return La propiedad fecha de participación como StringProperty
      */
     public StringProperty participaFechaProperty() {
@@ -161,6 +223,7 @@ public class Participante extends Persona {
     
     /**
      * Obtiene la fecha de participación.
+     * 
      * @return La fecha de participación como String
      */
     public String getParticipaFecha() {
@@ -169,6 +232,7 @@ public class Participante extends Persona {
     
     /**
      * Establece la fecha de participación.
+     * 
      * @param participaFecha La nueva fecha de participación
      */
     public void setParticipaFecha(String participaFecha) {
@@ -176,7 +240,8 @@ public class Participante extends Persona {
     }
 
     /**
-     * Obtiene la propiedad del nombre del evento.
+     * Obtiene la propiedad del nombre del evento para uso en JavaFX.
+     * 
      * @return La propiedad nombre del evento como StringProperty
      */
     public StringProperty evNombreProperty() {
@@ -185,6 +250,7 @@ public class Participante extends Persona {
     
     /**
      * Obtiene el nombre del evento.
+     * 
      * @return El nombre del evento como String
      */
     public String getEvNombre() {
@@ -193,6 +259,7 @@ public class Participante extends Persona {
     
     /**
      * Establece el nombre del evento.
+     * 
      * @param evNombre El nuevo nombre del evento
      */
     public void setEvNombre(String evNombre) {
@@ -200,7 +267,8 @@ public class Participante extends Persona {
     }
 
     /**
-     * Obtiene la propiedad de la descripción del evento.
+     * Obtiene la propiedad de la descripción del evento para uso en JavaFX.
+     * 
      * @return La propiedad descripción del evento como StringProperty
      */
     public StringProperty evDescripcionProperty() {
@@ -209,6 +277,7 @@ public class Participante extends Persona {
     
     /**
      * Obtiene la descripción del evento.
+     * 
      * @return La descripción del evento como String
      */
     public String getEvDescripcion() {
@@ -217,6 +286,7 @@ public class Participante extends Persona {
     
     /**
      * Establece la descripción del evento.
+     * 
      * @param evDescripcion La nueva descripción del evento
      */
     public void setEvDescripcion(String evDescripcion) {
@@ -224,7 +294,8 @@ public class Participante extends Persona {
     }
 
     /**
-     * Obtiene la propiedad del lugar del evento.
+     * Obtiene la propiedad del lugar del evento para uso en JavaFX.
+     * 
      * @return La propiedad lugar del evento como StringProperty
      */
     public StringProperty evLugarProperty() {
@@ -233,6 +304,7 @@ public class Participante extends Persona {
     
     /**
      * Obtiene el lugar del evento.
+     * 
      * @return El lugar del evento como String
      */
     public String getEvLugar() {
@@ -241,6 +313,7 @@ public class Participante extends Persona {
     
     /**
      * Establece el lugar del evento.
+     * 
      * @param evLugar El nuevo lugar del evento
      */
     public void setEvLugar(String evLugar) {
@@ -248,7 +321,8 @@ public class Participante extends Persona {
     }
 
     /**
-     * Obtiene la propiedad de la fecha de inicio del evento.
+     * Obtiene la propiedad de la fecha de inicio del evento para uso en JavaFX.
+     * 
      * @return La propiedad fecha de inicio del evento como StringProperty
      */
     public StringProperty evFechaInicioProperty() {
@@ -257,6 +331,7 @@ public class Participante extends Persona {
     
     /**
      * Obtiene la fecha de inicio del evento.
+     * 
      * @return La fecha de inicio del evento como String
      */
     public String getEvFechaInicio() {
@@ -265,6 +340,7 @@ public class Participante extends Persona {
     
     /**
      * Establece la fecha de inicio del evento.
+     * 
      * @param evFechaInicio La nueva fecha de inicio del evento
      */
     public void setEvFechaInicio(String evFechaInicio) {
@@ -272,7 +348,8 @@ public class Participante extends Persona {
     }
 
     /**
-     * Obtiene la propiedad de la fecha de fin del evento.
+     * Obtiene la propiedad de la fecha de fin del evento para uso en JavaFX.
+     * 
      * @return La propiedad fecha de fin del evento como StringProperty
      */
     public StringProperty evFechaFinProperty() {
@@ -281,6 +358,7 @@ public class Participante extends Persona {
     
     /**
      * Obtiene la fecha de fin del evento.
+     * 
      * @return La fecha de fin del evento como String
      */
     public String getEvFechaFin() {
@@ -289,17 +367,40 @@ public class Participante extends Persona {
     
     /**
      * Establece la fecha de fin del evento.
+     * 
      * @param evFechaFin La nueva fecha de fin del evento
      */
     public void setEvFechaFin(String evFechaFin) {
         this.evFechaFin.set(evFechaFin);
     }
     
-    // IMPLEMENTACIÓN DE MÉTODOS ABSTRACTOS DE Persona
+    /**
+     * Método auxiliar para compatibilidad con Evento.
+     * Obtiene la fecha de participación.
+     * 
+     * @return La fecha de participación
+     */
+    public String getFechaParticipacion() {
+        return getParticipaFecha();
+    }
     
+    /**
+     * Método auxiliar para compatibilidad con Evento.
+     * Establece la fecha de participación.
+     * 
+     * @param fechaParticipacion La nueva fecha de participación
+     */
+    public void setFechaParticipacion(String fechaParticipacion) {
+        setParticipaFecha(fechaParticipacion);
+    }
+    
+    //--------------------------------------------------
+    // IMPLEMENTACIÓN DE MÉTODOS ABSTRACTOS DE PERSONA
+    //--------------------------------------------------
     /**
      * Guarda o actualiza el participante en la base de datos.
      * Si el participante es nuevo, lo inserta; si ya existe, lo actualiza.
+     * Este método gestiona transacciones que afectan a múltiples tablas.
      * 
      * @return 1 si la operación tuvo éxito, 0 si falló
      */
@@ -309,6 +410,25 @@ public class Participante extends Persona {
         Connection con = null;
         try {
             con = Conexion.conectarBD();
+            if (con == null) {
+                mostrarAlerta(AlertType.ERROR, "Error de conexión", 
+                    "No se pudo conectar a la base de datos para guardar el participante");
+                return 0;
+            }
+            
+            // Validación básica de datos
+            if (getNombre() == null || getNombre().trim().isEmpty()) {
+                mostrarAlerta(AlertType.WARNING, "Datos incompletos", 
+                    "El nombre del participante no puede estar vacío");
+                return 0;
+            }
+            
+            if (getEmail() == null || getEmail().trim().isEmpty()) {
+                mostrarAlerta(AlertType.WARNING, "Datos incompletos", 
+                    "El email del participante no puede estar vacío");
+                return 0;
+            }
+            
             con.setAutoCommit(false);
             
             if (getId() == 0) {
@@ -321,7 +441,11 @@ public class Participante extends Persona {
                     psPersona.setString(1, getNombre());
                     psPersona.setString(2, getApellido1());
                     psPersona.setString(3, getApellido2());
-                    psPersona.executeUpdate();
+                    int filas = psPersona.executeUpdate();
+                    
+                    if (filas == 0) {
+                        throw new SQLException("Error al crear la persona. No se insertaron filas.");
+                    }
                     
                     // Obtener el ID generado
                     ResultSet rs = psPersona.getGeneratedKeys();
@@ -329,7 +453,7 @@ public class Participante extends Persona {
                         nuevoId = rs.getInt(1);
                         setId(nuevoId); // Actualizar el ID del objeto
                     } else {
-                        throw new Exception("No se pudo obtener el ID generado para la persona.");
+                        throw new SQLException("No se pudo obtener el ID generado para la persona.");
                     }
                 }
                 
@@ -338,20 +462,27 @@ public class Participante extends Persona {
                 try (PreparedStatement psParticipante = con.prepareStatement(queryParticipante)) {
                     psParticipante.setInt(1, getId());
                     psParticipante.setString(2, getEmail());
-                    psParticipante.executeUpdate();
+                    int filas = psParticipante.executeUpdate();
+                    
+                    if (filas == 0) {
+                        throw new SQLException("Error al crear el participante. No se insertaron filas.");
+                    }
                 }
                 
                 // 3. Insertar en la tabla "participa" solo si hay un evento válido
                 if (getEventoId() > 0) {
-                    String queryParticipa = "INSERT INTO participa (id_persona, fecha, id_evento) VALUES (?, ?, ?)";
+                    String queryParticipa = "INSERT INTO participa (id_persona, id_evento, fecha) VALUES (?, ?, ?)";
                     try (PreparedStatement psParticipa = con.prepareStatement(queryParticipa)) {
                         psParticipa.setInt(1, getId());
-                        psParticipa.setString(2, getParticipaFecha().isEmpty() ? 
+                        psParticipa.setInt(2, getEventoId());
+                        psParticipa.setString(3, getParticipaFecha().isEmpty() ? 
                                              java.time.LocalDate.now().toString() : getParticipaFecha());
-                        psParticipa.setInt(3, getEventoId());
                         psParticipa.executeUpdate();
                     }
                 }
+                
+                mostrarAlerta(AlertType.INFORMATION, "Operación exitosa", 
+                    "Participante creado correctamente con ID: " + getId());
             } else {
                 // ACTUALIZACIÓN DE UN PARTICIPANTE EXISTENTE
                 
@@ -362,7 +493,11 @@ public class Participante extends Persona {
                     psPersona.setString(2, getApellido1());
                     psPersona.setString(3, getApellido2());
                     psPersona.setInt(4, getId());
-                    psPersona.executeUpdate();
+                    int filas = psPersona.executeUpdate();
+                    
+                    if (filas == 0) {
+                        throw new SQLException("Error al actualizar la persona. La persona con ID " + getId() + " no existe.");
+                    }
                 }
                 
                 // 2. Actualizar datos de la tabla "participante"
@@ -370,7 +505,11 @@ public class Participante extends Persona {
                 try (PreparedStatement psParticipante = con.prepareStatement(queryParticipante)) {
                     psParticipante.setString(1, getEmail());
                     psParticipante.setInt(2, getId());
-                    psParticipante.executeUpdate();
+                    int filas = psParticipante.executeUpdate();
+                    
+                    if (filas == 0) {
+                        throw new SQLException("Error al actualizar el participante. El participante con ID " + getId() + " no existe.");
+                    }
                 }
                 
                 // 3. Actualizar (o insertar) datos en la tabla "participa" SOLO si hay un evento válido
@@ -392,37 +531,58 @@ public class Participante extends Persona {
                             }
                         } else {
                             // Si no existe, se inserta:
-                            String queryInsertParticipa = "INSERT INTO participa (id_persona, fecha, id_evento) VALUES (?, ?, ?)";
+                            String queryInsertParticipa = "INSERT INTO participa (id_persona, id_evento, fecha) VALUES (?, ?, ?)";
                             try (PreparedStatement psInsertP = con.prepareStatement(queryInsertParticipa)) {
                                 psInsertP.setInt(1, getId());
-                                psInsertP.setString(2, getParticipaFecha().isEmpty() ? 
+                                psInsertP.setInt(2, getEventoId());
+                                psInsertP.setString(3, getParticipaFecha().isEmpty() ? 
                                                   java.time.LocalDate.now().toString() : getParticipaFecha());
-                                psInsertP.setInt(3, getEventoId());
                                 psInsertP.executeUpdate();
                             }
                         }
                     }
                 }
+                
+                mostrarAlerta(AlertType.INFORMATION, "Operación exitosa", 
+                    "Participante actualizado correctamente");
             }
             
             con.commit();
             result = 1;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             if (con != null) {
                 try {
                     con.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
+                    System.err.println("Error al revertir transacción: " + ex.getMessage());
                     ex.printStackTrace();
                 }
             }
-            System.out.println("Error en Participante.save(): " + e.getMessage());
+            
+            String errorMsg = "Error al guardar el participante: ";
+            if (e.getMessage().contains("foreign key")) {
+                errorMsg += "El evento seleccionado no existe o hay un problema con las referencias.";
+            } else if (e.getMessage().contains("unique") || e.getMessage().contains("duplicate")) {
+                errorMsg += "Ya existe un participante con estos datos.";
+            } else {
+                errorMsg += e.getMessage();
+            }
+            
+            mostrarAlerta(AlertType.ERROR, "Error de base de datos", errorMsg);
+            System.err.println("Error de SQL en Participante.save(): " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            mostrarAlerta(AlertType.ERROR, "Error inesperado", 
+                "Se produjo un error inesperado al guardar el participante: " + e.getMessage());
+            System.err.println("Error inesperado en Participante.save(): " + e.getMessage());
             e.printStackTrace();
         } finally {
             if (con != null) {
                 try {
                     con.setAutoCommit(true);
                     con.close();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
+                    System.err.println("Error al cerrar conexión: " + ex.getMessage());
                     ex.printStackTrace();
                 }
             }
@@ -433,6 +593,7 @@ public class Participante extends Persona {
     /**
      * Elimina un participante de la base de datos.
      * También elimina sus relaciones en las tablas participa y participante.
+     * Este método gestiona una transacción que afecta a múltiples tablas.
      * 
      * @param id ID del participante a eliminar
      * @return 1 si la operación tuvo éxito, 0 si falló
@@ -442,58 +603,89 @@ public class Participante extends Persona {
         Connection con = null;
         try {
             con = Conexion.conectarBD();
+            if (con == null) {
+                mostrarAlerta(AlertType.ERROR, "Error de conexión", 
+                    "No se pudo conectar a la base de datos para eliminar el participante");
+                return 0;
+            }
+            
             con.setAutoCommit(false);
             
-            // Primero eliminar de participa
+            // Primero eliminar de participa (relaciones con eventos)
             String queryParticipa = "DELETE FROM participa WHERE id_persona = ?";
             try (PreparedStatement psParticipa = con.prepareStatement(queryParticipa)) {
                 psParticipa.setInt(1, id);
                 psParticipa.executeUpdate();
+                // No verificamos el resultado porque podría no tener participaciones
             }
             
-            // Luego eliminar de participante
+            // Luego eliminar de participante (especialización)
             String queryParticipante = "DELETE FROM participante WHERE id_persona = ?";
             try (PreparedStatement psParticipante = con.prepareStatement(queryParticipante)) {
                 psParticipante.setInt(1, id);
-                psParticipante.executeUpdate();
+                int filas = psParticipante.executeUpdate();
+                if (filas == 0) {
+                    throw new SQLException("No se encontró el participante con ID " + id);
+                }
             }
             
-            // Finalmente eliminar de persona
+            // Finalmente eliminar de persona (entidad base)
             String queryPersona = "DELETE FROM persona WHERE id = ?";
             try (PreparedStatement psPersona = con.prepareStatement(queryPersona)) {
                 psPersona.setInt(1, id);
-                psPersona.executeUpdate();
+                int filas = psPersona.executeUpdate();
+                if (filas == 0) {
+                    throw new SQLException("No se encontró la persona con ID " + id);
+                }
             }
             
             con.commit();
+            mostrarAlerta(AlertType.INFORMATION, "Eliminación exitosa", 
+                "El participante ha sido eliminado correctamente");
             return 1;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             if (con != null) {
                 try {
                     con.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
+                    System.err.println("Error al revertir transacción: " + ex.getMessage());
                     ex.printStackTrace();
                 }
             }
-            System.out.println("Error en Participante.delete(): " + e.getMessage());
+            
+            String errorMsg = "Error al eliminar el participante: ";
+            if (e.getMessage().contains("foreign key")) {
+                errorMsg += "Este participante tiene relaciones que impiden su eliminación.";
+            } else {
+                errorMsg += e.getMessage();
+            }
+            
+            mostrarAlerta(AlertType.ERROR, "Error de base de datos", errorMsg);
+            System.err.println("Error de SQL en Participante.delete(): " + e.getMessage());
             e.printStackTrace();
-            return 0;
+        } catch (Exception e) {
+            mostrarAlerta(AlertType.ERROR, "Error inesperado", 
+                "Se produjo un error inesperado al eliminar el participante: " + e.getMessage());
+            System.err.println("Error inesperado en Participante.delete(): " + e.getMessage());
+            e.printStackTrace();
         } finally {
             if (con != null) {
                 try {
                     con.setAutoCommit(true);
                     con.close();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
+                    System.err.println("Error al cerrar conexión: " + ex.getMessage());
                     ex.printStackTrace();
                 }
             }
         }
+        return 0;
     }
 
     /**
      * Obtiene el último ID de participante (realmente de persona) en la base de datos.
      * 
-     * @return El último ID como entero
+     * @return El último ID como entero, o 0 si no hay registros o hubo un error
      */
     @Override
     public int getLastId() {
@@ -501,12 +693,25 @@ public class Participante extends Persona {
         try (Connection con = Conexion.conectarBD();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(query)) {
+            
+            if (con == null) {
+                mostrarAlerta(AlertType.ERROR, "Error de conexión", 
+                    "No se pudo conectar a la base de datos para obtener el último ID");
+                return 0;
+            }
              
             if (rs.next()) {
                 return rs.getInt(1);
             }
+        } catch (SQLException e) {
+            mostrarAlerta(AlertType.ERROR, "Error de base de datos", 
+                "Error al obtener el último ID: " + e.getMessage());
+            System.err.println("Error de SQL en Participante.getLastId(): " + e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
-            System.out.println("Error en Participante.getLastId(): " + e.getMessage());
+            mostrarAlerta(AlertType.ERROR, "Error inesperado", 
+                "Error inesperado al obtener el último ID: " + e.getMessage());
+            System.err.println("Error inesperado en Participante.getLastId(): " + e.getMessage());
             e.printStackTrace();
         }
         return 0;
@@ -514,6 +719,7 @@ public class Participante extends Persona {
 
     /**
      * Busca participantes por texto en el nombre, apellidos o email.
+     * Permite búsquedas parciales usando LIKE en SQL.
      * 
      * @param txt Texto a buscar
      * @return Lista observable con los participantes encontrados
@@ -528,6 +734,12 @@ public class Participante extends Persona {
                       
         try (Connection con = Conexion.conectarBD();
              PreparedStatement ps = con.prepareStatement(query)) {
+            
+            if (con == null) {
+                mostrarAlerta(AlertType.ERROR, "Error de conexión", 
+                    "No se pudo conectar a la base de datos para buscar participantes");
+                return lista;
+            }
             
             String param = "%" + txt + "%";
             ps.setString(1, param);
@@ -546,8 +758,21 @@ public class Participante extends Persona {
                 Participante participante = new Participante(id, nombre, apellido1, apellido2, email);
                 lista.add(participante);
             }
+        } catch (SQLException e) {
+            String errorMsg = "Error al buscar participantes con el texto '" + txt + "': ";
+            if (e.getMessage().contains("doesn't exist")) {
+                errorMsg += "La tabla participante o persona no existe.";
+            } else {
+                errorMsg += e.getMessage();
+            }
+            
+            mostrarAlerta(AlertType.ERROR, "Error de base de datos", errorMsg);
+            System.err.println("Error de SQL en Participante.get(String): " + e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
-            System.out.println("Error en Participante.get(String): " + e.getMessage());
+            mostrarAlerta(AlertType.ERROR, "Error inesperado", 
+                "Error inesperado al buscar participantes: " + e.getMessage());
+            System.err.println("Error inesperado en Participante.get(String): " + e.getMessage());
             e.printStackTrace();
         }
         return lista;
@@ -569,6 +794,12 @@ public class Participante extends Persona {
         try (Connection con = Conexion.conectarBD();
              PreparedStatement ps = con.prepareStatement(query)) {
             
+            if (con == null) {
+                mostrarAlerta(AlertType.ERROR, "Error de conexión", 
+                    "No se pudo conectar a la base de datos para buscar el participante");
+                return null;
+            }
+            
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             
@@ -580,15 +811,32 @@ public class Participante extends Persona {
                 
                 return new Participante(id, nombre, apellido1, apellido2, email);
             }
+        } catch (SQLException e) {
+            String errorMsg = "Error al buscar el participante con ID " + id + ": ";
+            if (e.getMessage().contains("doesn't exist")) {
+                errorMsg += "La tabla participante o persona no existe.";
+            } else {
+                errorMsg += e.getMessage();
+            }
+            
+            mostrarAlerta(AlertType.ERROR, "Error de base de datos", errorMsg);
+            System.err.println("Error de SQL en Participante.get(int): " + e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
-            System.out.println("Error en Participante.get(int): " + e.getMessage());
+            mostrarAlerta(AlertType.ERROR, "Error inesperado", 
+                "Error inesperado al buscar el participante: " + e.getMessage());
+            System.err.println("Error inesperado en Participante.get(int): " + e.getMessage());
             e.printStackTrace();
         }
         return null;
     }
 
+    //--------------------------------------------------
+    // MÉTODOS ESTÁTICOS DE ACCESO A DATOS
+    //--------------------------------------------------
     /**
      * Obtiene todos los participantes de la base de datos.
+     * Los resultados incluyen la fecha más reciente de participación para cada uno.
      * 
      * @param lista Lista observable donde se cargarán los participantes
      * @return La lista actualizada con los participantes
@@ -604,6 +852,12 @@ public class Participante extends Persona {
         try (Connection con = Conexion.conectarBD();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(query)) {
+            
+            if (con == null) {
+                mostrarAlerta(AlertType.ERROR, "Error de conexión", 
+                    "No se pudo conectar a la base de datos para obtener los participantes");
+                return lista;
+            }
 
             lista.clear();
             while (rs.next()) {
@@ -619,8 +873,23 @@ public class Participante extends Persona {
                                                           participaFecha != null ? participaFecha : "");
                 lista.add(participante);
             }
+        } catch (SQLException e) {
+            String errorMsg = "Error al recuperar la lista de participantes: ";
+            if (e.getMessage().contains("doesn't exist")) {
+                errorMsg += "Una de las tablas no existe en la base de datos.";
+            } else if (e.getMessage().contains("Unknown column")) {
+                errorMsg += "Una columna no existe: " + e.getMessage();
+            } else {
+                errorMsg += e.getMessage();
+            }
+            
+            mostrarAlerta(AlertType.ERROR, "Error de base de datos", errorMsg);
+            System.err.println("Error de SQL en Participante.getAll(): " + e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
-            System.out.println("Error de SQL en Participante.getAll(): " + e.getMessage());
+            mostrarAlerta(AlertType.ERROR, "Error inesperado", 
+                "Error inesperado al recuperar los participantes: " + e.getMessage());
+            System.err.println("Error inesperado en Participante.getAll(): " + e.getMessage());
             e.printStackTrace();
         }
         return lista;
@@ -641,6 +910,12 @@ public class Participante extends Persona {
         try (Connection con = Conexion.conectarBD();
              PreparedStatement ps = con.prepareStatement(query)) {
             
+            if (con == null) {
+                mostrarAlerta(AlertType.ERROR, "Error de conexión", 
+                    "No se pudo conectar a la base de datos para obtener los eventos del participante");
+                return listaEventos;
+            }
+            
             ps.setInt(1, participanteId);
             ResultSet rs = ps.executeQuery();
             
@@ -659,10 +934,63 @@ public class Participante extends Persona {
                 evento.setFechaParticipacion(fechaParticipacion);
                 listaEventos.add(evento);
             }
+        } catch (SQLException e) {
+            String errorMsg = "Error al recuperar eventos del participante con ID " + participanteId + ": ";
+            if (e.getMessage().contains("doesn't exist")) {
+                errorMsg += "Una de las tablas no existe en la base de datos.";
+            } else if (e.getMessage().contains("Unknown column")) {
+                errorMsg += "Una columna no existe: " + e.getMessage();
+            } else {
+                errorMsg += e.getMessage();
+            }
+            
+            mostrarAlerta(AlertType.ERROR, "Error de base de datos", errorMsg);
+            System.err.println("Error de SQL en Participante.getEventosForParticipante(): " + e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
-            System.out.println("Error de SQL en Participante.getEventosForParticipante(): " + e.getMessage());
+            mostrarAlerta(AlertType.ERROR, "Error inesperado", 
+                "Error inesperado al recuperar los eventos del participante: " + e.getMessage());
+            System.err.println("Error inesperado en Participante.getEventosForParticipante(): " + e.getMessage());
             e.printStackTrace();
         }
         return listaEventos;
+    }
+    
+    //--------------------------------------------------
+    // MÉTODOS AUXILIARES
+    //--------------------------------------------------
+    /**
+     * Muestra un cuadro de diálogo de alerta con el tipo, título y mensaje especificados.
+     * Utiliza Platform.runLater para asegurar que la alerta se muestre en el hilo de JavaFX.
+     * 
+     * @param tipo El tipo de alerta (ERROR, INFORMATION, WARNING, etc.)
+     * @param titulo El título del cuadro de diálogo
+     * @param mensaje El mensaje a mostrar
+     */
+    private static void mostrarAlerta(AlertType tipo, String titulo, String mensaje) {
+        try {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(tipo);
+                alert.setTitle(titulo);
+                alert.setHeaderText(null);
+                alert.setContentText(mensaje);
+                alert.showAndWait();
+            });
+        } catch (Exception e) {
+            // Si no se puede mostrar la alerta (por ejemplo, si no estamos en un hilo JavaFX)
+            System.err.println("[ALERTA " + tipo + "] " + titulo + ": " + mensaje);
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Devuelve una representación en texto del participante, útil para depuración.
+     * 
+     * @return Una cadena con los datos principales del participante
+     */
+    @Override
+    public String toString() {
+        return "Participante [id=" + getId() + ", nombre=" + getNombre() + " " + 
+               getApellido1() + ", email=" + getEmail() + "]";
     }
 }

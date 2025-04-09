@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,317 +29,606 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+/**
+ * Controlador para la vista de gestión de eventos.
+ * Permite crear, ver, editar y eliminar eventos del sistema,
+ * incluyendo la asignación de categorías mediante selección visual.
+ * 
+ * <p>Este controlador implementa un patrón MVVM, utilizando propiedades
+ * observables para la vinculación bidireccional con la interfaz de usuario.</p>
+ * 
+ * @author Jesús
+ * @version 1.0
+ */
 public class EventoController {
 
-    // ------------------- VARIABLES Y CAMPOS FXML -------------------
-    
-    // Control de la ventana
+    //--------------------------------------------------
+    // CONTROLES DE INTERFAZ
+    //--------------------------------------------------
+    /**
+     * Barra de título personalizada para mover la ventana.
+     */
     @FXML
     private HBox barraTitulo;
+    
+    /**
+     * Coordenada X inicial para el movimiento de la ventana.
+     */
     private double xOffset = 0;
+    
+    /**
+     * Coordenada Y inicial para el movimiento de la ventana.
+     */
     private double yOffset = 0;
 
-    // TableView y sus columnas
+    /**
+     * TableView que muestra los eventos del sistema.
+     */
     @FXML
-    TableView<Evento> tableView;  
+    private TableView<Evento> tableView;
 
+    /**
+     * Columna para el nombre del evento.
+     */
     @FXML
-    private TableColumn<Evento, String> nombre;   
- 
+    private TableColumn<Evento, String> nombre;
+    
+    /**
+     * Columna para la descripción del evento.
+     */
     @FXML
     private TableColumn<Evento, String> descripcion;
 
+    /**
+     * Columna para el lugar donde se celebra el evento.
+     */
     @FXML
-    private TableColumn<Evento, String> lugar;    
- 
+    private TableColumn<Evento, String> lugar;
+    
+    /**
+     * Columna para la fecha de inicio del evento.
+     */
     @FXML
-    private TableColumn<Evento, String> fecha_inicio;   
- 
+    private TableColumn<Evento, String> fecha_inicio;
+    
+    /**
+     * Columna para la fecha de finalización del evento.
+     */
     @FXML
     private TableColumn<Evento, String> fecha_fin;
 
+    /**
+     * Columna para el nombre de la categoría del evento.
+     */
     @FXML
     private TableColumn<Evento, String> nombre_categoria;
 
+    /**
+     * Columna para los botones de acción (guardar, eliminar).
+     */
     @FXML
     private TableColumn<Evento, Void> acciones;
-     
-    // Listas de datos
+    
+    //--------------------------------------------------
+    // COLECCIONES DE DATOS
+    //--------------------------------------------------
+    /**
+     * Lista observable que contiene todos los eventos mostrados en la tabla.
+     */
     private ObservableList<Evento> listaEventos = FXCollections.observableArrayList();
-    private Map<Integer, String> mapaCategorias = new HashMap<>(); // Relación id_categoria -> nombre_categoria
     
-    // ------------------- MÉTODOS DE CONTROL DE VENTANA -------------------
-    
+    /**
+     * Mapa que relaciona IDs de categorías con sus nombres para mostrarlos en la interfaz.
+     */
+    private Map<Integer, String> mapaCategorias = new HashMap<>();
+
+    //--------------------------------------------------
+    // CONTROL DE VENTANA
+    //--------------------------------------------------
+    /**
+     * Minimiza la ventana actual.
+     * 
+     * @param event El evento que desencadenó esta acción
+     */
     @FXML
     private void minimizarVentana(ActionEvent event) {
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setIconified(true); // Minimiza la ventana
+        try {
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setIconified(true);
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", "No se pudo minimizar la ventana: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * Maximiza o restaura la ventana actual.
+     * 
+     * @param event El evento que desencadenó esta acción
+     */
     @FXML
     private void maximizarVentana(ActionEvent event) {
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        if (stage.isMaximized()) {
-            stage.setMaximized(false); // Restaura el tamaño original
-        } else {
-            stage.setMaximized(true); // Maximiza la ventana
+        try {
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setMaximized(!stage.isMaximized());
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", "No se pudo maximizar/restaurar la ventana: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Cierra la ventana actual.
+     * 
+     * @param event El evento que desencadenó esta acción
+     */
     @FXML
     private void cerrarVentana(ActionEvent event) {
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.close(); // Cierra la ventana
-    }
-    
-    // ------------------- INICIALIZACIÓN -------------------
-    
-    public void initialize() {
-        // Precargar mapa de categorías
-        precargaCategorias();
-        
-        // Configurar columnas del TableView
-        configurarColumnas();
-        
-        // Configurar columna nombre_categoria
-        configurarColumnaNombreCategoria();
-        
-        // Configurar columna acciones
-        configurarColumnaAcciones();
-        
-        // Configurar movimiento de ventana
-        configurarMovimientoVentana();
-        
-        // Configurar selección y edición
-        configurarSeleccionYEdicion();
-        
-        // Cargar datos iniciales
-        tableView.setItems(listaEventos);
-        loadData();    
-    }
-    
-    private void precargaCategorias() {
-        // Precargar el mapa de categorías
-        ObservableList<Categoria> listaCategorias = FXCollections.observableArrayList();
-        Categoria.getAll(listaCategorias);
-        
-        // Crear el mapa id_categoria -> nombre_categoria
-        for (Categoria categoria : listaCategorias) {
-            mapaCategorias.put(categoria.getId(), categoria.getNombre());
+        try {
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.close();
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", "No se pudo cerrar la ventana: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
-    private void configurarColumnas() {
-        // Configurar cell value factories
-        
-        nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        descripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
-        lugar.setCellValueFactory(new PropertyValueFactory<>("lugar"));
-        fecha_inicio.setCellValueFactory(new PropertyValueFactory<>("fecha_inicio"));
-        fecha_fin.setCellValueFactory(new PropertyValueFactory<>("fecha_fin"));
-        
-        // Configurar cell factories para edición
-        nombre.setCellFactory(TextFieldTableCell.forTableColumn());
-        descripcion.setCellFactory(TextFieldTableCell.forTableColumn());
-        lugar.setCellFactory(TextFieldTableCell.forTableColumn());
-        fecha_inicio.setCellFactory(TextFieldTableCell.forTableColumn());
-        fecha_fin.setCellFactory(TextFieldTableCell.forTableColumn());
-        
-        // Configurar política de redimensionamiento
-        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-    }
-    
-    private void configurarColumnaNombreCategoria() {
-        // Cargar los nombres de todas las categorías para el ComboBox
-        ObservableList<String> nombresCategorias = FXCollections.observableArrayList();
-        Categoria.getNombres(nombresCategorias);
-        
-        // Configurar la columna para mostrar el nombre correcto de la categoría
-        nombre_categoria.setCellValueFactory(cellData -> {
-            Evento evento = cellData.getValue();
-            String nombreCategoria = mapaCategorias.getOrDefault(evento.getId_categoria(), "Sin categoría");
-            return new SimpleStringProperty(nombreCategoria);
-        });
-        
-        // Configurar ComboBox con interfaz personalizada
-        nombre_categoria.setCellFactory(column -> {
-            return new ComboBoxTableCell<Evento, String>(nombresCategorias) {
-                {
-                    // Añadir tooltip a la celda
-                    setTooltip(new Tooltip("Haga clic para seleccionar una categoría"));
-                }
-                
-                @Override
-                public void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    
-                    if (item == null || empty) {
-                        setText(null);
-                        setGraphic(null);
-                    } else {
-                        // Crear contenedor para texto e indicador
-                        HBox content = new HBox(5);
-                        content.setAlignment(Pos.CENTER_LEFT);
-                        
-                        // Texto de la categoría
-                        Label texto = new Label(item);
-                        
-                        // Indicador de desplegable
-                        Label indicador = new Label("▼");
-                        indicador.setStyle("-fx-text-fill: #666666; -fx-font-size: 8pt;");
-                        
-                        content.getChildren().addAll(texto, indicador);
-                        
-                        // Aplicar estilo para que parezca un combo box
-                        setStyle("-fx-background-color: #3c3c3c; -fx-border-color: #555555; -fx-border-radius: 3;");
-                        
-                        // Establecer el contenido personalizado
-                        setText(null);
-                        setGraphic(content);
-                    }
-                }
-                
-                // Activar automáticamente el editor al hacer clic
-                @Override
-                public void startEdit() {
-                    super.startEdit();
-                }
-            };
-        });
-        
-        // Configurar acción al editar
-        nombre_categoria.setOnEditCommit(event -> {
-            Evento evento = event.getRowValue();
-            String nuevoNombreCategoria = event.getNewValue();
+    //--------------------------------------------------
+    // INICIALIZACIÓN
+    //--------------------------------------------------
+    /**
+     * Método de inicialización que se ejecuta al cargar la vista.
+     * Configura las columnas, los eventos y carga los datos iniciales.
+     */
+    public void initialize() {
+        try {
+            // Precargar mapa de categorías
+            precargaCategorias();
             
-            // Buscar el ID de la categoría correspondiente al nombre seleccionado
-            for (Map.Entry<Integer, String> entry : mapaCategorias.entrySet()) {
-                if (entry.getValue().equals(nuevoNombreCategoria)) {
-                    evento.setId_categoria(entry.getKey());
-                    evento.save();
-                    break;
-                }
-            }
-        });
+            // Configurar columnas del TableView
+            configurarColumnas();
+            
+            // Configurar columna nombre_categoria
+            configurarColumnaNombreCategoria();
+            
+            // Configurar columna acciones
+            configurarColumnaAcciones();
+            
+            // Configurar movimiento de ventana
+            configurarMovimientoVentana();
+            
+            // Configurar selección y edición
+            configurarSeleccionYEdicion();
+            
+            // Cargar datos iniciales
+            tableView.setItems(listaEventos);
+            loadData();
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error de inicialización", 
+                "No se pudo inicializar correctamente el controlador: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
-    private void configurarColumnaAcciones() {
-        acciones.setCellFactory(new Callback<>() {
-            @Override
-            public TableCell<Evento, Void> call(final TableColumn<Evento, Void> param) {
-                return new TableCell<>() {
-                    private final Button btnGuardar = new Button("✔");
-                    private final Button btnCancelar = new Button("✖");
+    /**
+     * Precarga el mapa de categorías para mostrar los nombres en lugar de IDs.
+     * Este mapa relaciona cada ID de categoría con su nombre correspondiente.
+     */
+    private void precargaCategorias() {
+        try {
+            ObservableList<Categoria> listaCategorias = FXCollections.observableArrayList();
+            Categoria.getAll(listaCategorias);
+            
+            // Limpiar mapa existente
+            mapaCategorias.clear();
+            
+            // Crear el mapa id_categoria -> nombre_categoria
+            for (Categoria categoria : listaCategorias) {
+                mapaCategorias.put(categoria.getId(), categoria.getNombre());
+            }
+            
+            // Asegurar que siempre haya una entrada para el ID 0
+            if (!mapaCategorias.containsKey(0)) {
+                mapaCategorias.put(0, "Sin categoría");
+            }
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", "No se pudieron cargar las categorías: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
     
+    /**
+     * Configura las columnas básicas del TableView.
+     * Establece las fábricas de valores y celdas para columnas editables.
+     */
+    private void configurarColumnas() {
+        try {
+            // Configurar cell value factories para vincular columnas con propiedades
+            nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+            descripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
+            lugar.setCellValueFactory(new PropertyValueFactory<>("lugar"));
+            fecha_inicio.setCellValueFactory(new PropertyValueFactory<>("fecha_inicio"));
+            fecha_fin.setCellValueFactory(new PropertyValueFactory<>("fecha_fin"));
+            
+            // Configurar cell factories para edición con TextFieldTableCell
+            nombre.setCellFactory(TextFieldTableCell.forTableColumn());
+            descripcion.setCellFactory(TextFieldTableCell.forTableColumn());
+            lugar.setCellFactory(TextFieldTableCell.forTableColumn());
+            fecha_inicio.setCellFactory(TextFieldTableCell.forTableColumn());
+            fecha_fin.setCellFactory(TextFieldTableCell.forTableColumn());
+            
+            // Configurar política de redimensionamiento para mejor visualización
+            tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", "No se pudieron configurar las columnas: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Configura la columna especial para nombres de categorías.
+     * Implementa un ComboBox personalizado para seleccionar categorías.
+     */
+    private void configurarColumnaNombreCategoria() {
+        try {
+            // Cargar los nombres de todas las categorías para el ComboBox
+            ObservableList<String> nombresCategorias = FXCollections.observableArrayList();
+            Categoria.getNombres(nombresCategorias);
+            
+            // Añadir "Sin categoría" si no está ya incluido
+            if (!nombresCategorias.contains("Sin categoría")) {
+                nombresCategorias.add("Sin categoría");
+            }
+            
+            // Configurar la fábrica de valores para mostrar el nombre de la categoría
+            nombre_categoria.setCellValueFactory(cellData -> {
+                Evento evento = cellData.getValue();
+                String nombreCategoria = mapaCategorias.getOrDefault(evento.getId_categoria(), "Sin categoría");
+                return new SimpleStringProperty(nombreCategoria);
+            });
+            
+            // Configurar ComboBox con interfaz personalizada
+            nombre_categoria.setCellFactory(column -> {
+                return new ComboBoxTableCell<Evento, String>(nombresCategorias) {
                     {
-                        btnGuardar.setOnAction(event -> {
-                            Evento evento = getTableView().getItems().get(getIndex());
-                            saveRow(evento);
-                        });
-    
-                        btnCancelar.setOnAction(event -> {
-                            Evento evento = getTableView().getItems().get(getIndex());
-                            deleteRow();
-                        });
+                        // Añadir tooltip para guiar al usuario
+                        setTooltip(new Tooltip("Haga clic para seleccionar una categoría"));
                     }
-    
+                    
                     @Override
-                    protected void updateItem(Void item, boolean empty) {
+                    public void updateItem(String item, boolean empty) {
                         super.updateItem(item, empty);
-                        if (empty || getTableView().getSelectionModel().getSelectedIndex() != getIndex()) {
+                        
+                        if (item == null || empty) {
+                            setText(null);
                             setGraphic(null);
                         } else {
-                            HBox hBox = new HBox(5, btnGuardar, btnCancelar);
-                            setGraphic(hBox);
+                            // Crear contenedor personalizado con indicador visual
+                            HBox content = new HBox(5);
+                            content.setAlignment(Pos.CENTER_LEFT);
+                            
+                            // Texto e indicador visual
+                            Label texto = new Label(item);
+                            Label indicador = new Label("▼");
+                            indicador.setStyle("-fx-text-fill: #666666; -fx-font-size: 8pt;");
+                            
+                            content.getChildren().addAll(texto, indicador);
+                            
+                            // Estilo visual para parecer un ComboBox
+                            setStyle("-fx-background-color: #3c3c3c; -fx-border-color: #555555; -fx-border-radius: 3;");
+                            
+                            setText(null);
+                            setGraphic(content);
                         }
                     }
+                    
+                    // Activar edición automáticamente al hacer clic
+                    @Override
+                    public void startEdit() {
+                        super.startEdit();
+                    }
                 };
-            }
-        });
+            });
+            
+            // Configurar acción al confirmar la edición
+            nombre_categoria.setOnEditCommit(event -> {
+                try {
+                    Evento evento = event.getRowValue();
+                    String nuevoNombreCategoria = event.getNewValue();
+                    
+                    // Buscar el ID correspondiente al nombre de categoría seleccionado
+                    Integer categoriaId = null;
+                    for (Map.Entry<Integer, String> entry : mapaCategorias.entrySet()) {
+                        if (entry.getValue().equals(nuevoNombreCategoria)) {
+                            categoriaId = entry.getKey();
+                            break;
+                        }
+                    }
+                    
+                    // Si encontramos la categoría, actualizar el evento
+                    if (categoriaId != null) {
+                        evento.setId_categoria(categoriaId);
+                        
+                        // Guardar el cambio en la base de datos
+                        int result = evento.save();
+                        if (result <= 0) {
+                            showAlert(AlertType.WARNING, "Advertencia", 
+                                "No se pudo guardar la categoría. Verifique los datos.");
+                            
+                            // Recargar datos para deshacer cambios visuales
+                            loadData();
+                        }
+                    } else if ("Sin categoría".equals(nuevoNombreCategoria)) {
+                        // Establecer sin categoría (ID 0)
+                        evento.setId_categoria(0);
+                        evento.save();
+                    }
+                } catch (Exception e) {
+                    showAlert(AlertType.ERROR, "Error", 
+                        "Error al cambiar la categoría: " + e.getMessage());
+                    e.printStackTrace();
+                    
+                    // Recargar datos para mostrar el estado correcto
+                    loadData();
+                }
+            });
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", 
+                "No se pudo configurar la columna de categorías: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
+    /**
+     * Configura la columna de acciones con botones para guardar y eliminar eventos.
+     * Los botones solo se muestran en la fila seleccionada.
+     */
+    private void configurarColumnaAcciones() {
+        try {
+            acciones.setCellFactory(new Callback<>() {
+                @Override
+                public TableCell<Evento, Void> call(final TableColumn<Evento, Void> param) {
+                    return new TableCell<>() {
+                        private final Button btnGuardar = new Button("✔");
+                        private final Button btnEliminar = new Button("✖");
+        
+                        {
+                            // Configurar tooltips para los botones
+                            btnGuardar.setTooltip(new Tooltip("Guardar cambios"));
+                            btnEliminar.setTooltip(new Tooltip("Eliminar evento"));
+                            
+                            // Aplicar estilos visuales
+                            btnGuardar.getStyleClass().add("action-button");
+                            btnEliminar.getStyleClass().add("action-button");
+                            
+                            // Configurar acciones de los botones
+                            btnGuardar.setOnAction(event -> {
+                                Evento evento = getTableView().getItems().get(getIndex());
+                                saveRow(evento);
+                            });
+        
+                            btnEliminar.setOnAction(event -> {
+                                tableView.getSelectionModel().select(getIndex());
+                                deleteRow();
+                            });
+                        }
+        
+                        @Override
+                        protected void updateItem(Void item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (empty || getTableView().getSelectionModel().getSelectedIndex() != getIndex()) {
+                                setGraphic(null); // No mostrar botones si la celda está vacía o no seleccionada
+                            } else {
+                                HBox hBox = new HBox(5, btnGuardar, btnEliminar);
+                                hBox.setAlignment(Pos.CENTER);
+                                setGraphic(hBox); // Mostrar botones en la fila seleccionada
+                            }
+                        }
+                    };
+                }
+            });
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", 
+                "No se pudo configurar la columna de acciones: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Configura la funcionalidad para mover la ventana arrastrando la barra de título.
+     */
     private void configurarMovimientoVentana() {
-        barraTitulo.setOnMousePressed(event -> {
-            Stage stage = (Stage) barraTitulo.getScene().getWindow();
-            xOffset = event.getSceneX();
-            yOffset = event.getSceneY();
-        });
-
-        barraTitulo.setOnMouseDragged(event -> {
-            Stage stage = (Stage) barraTitulo.getScene().getWindow();
-            stage.setX(event.getScreenX() - xOffset);
-            stage.setY(event.getScreenY() - yOffset);
-        });
+        try {
+            barraTitulo.setOnMousePressed(event -> {
+                Stage stage = (Stage) barraTitulo.getScene().getWindow();
+                xOffset = event.getSceneX();
+                yOffset = event.getSceneY();
+            });
+    
+            barraTitulo.setOnMouseDragged(event -> {
+                Stage stage = (Stage) barraTitulo.getScene().getWindow();
+                stage.setX(event.getScreenX() - xOffset);
+                stage.setY(event.getScreenY() - yOffset);
+            });
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", 
+                "No se pudo configurar el movimiento de la ventana: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
+    /**
+     * Configura la selección y edición de filas en la tabla.
+     * Añade listeners para actualizar la visualización cuando cambia la selección.
+     */
     private void configurarSeleccionYEdicion() {
-        tableView.getSelectionModel().selectedIndexProperty().addListener((obs, oldSelection, newSelection) -> {
-            tableView.refresh();
-        });
-        tableView.setEditable(true);
+        try {
+            // Actualizar visualización cuando cambia la selección
+            tableView.getSelectionModel().selectedIndexProperty().addListener((obs, oldSelection, newSelection) -> {
+                tableView.refresh();
+            });
+            
+            // Habilitar edición en la tabla
+            tableView.setEditable(true);
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", 
+                "No se pudo configurar la selección y edición: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
-    // ------------------- MÉTODOS DE GESTIÓN DE DATOS -------------------
-    
+    //--------------------------------------------------
+    // MANEJO DE DATOS
+    //--------------------------------------------------
+    /**
+     * Carga todos los eventos desde la base de datos.
+     * Actualiza la lista observable con los eventos recuperados.
+     */
     private void loadData() {
-        listaEventos.clear();
-        Evento.getAll(listaEventos);
+        try {
+            // Limpiar la lista actual
+            listaEventos.clear();
+            
+            // Cargar eventos desde la base de datos
+            Evento.getAll(listaEventos);
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", 
+                "No se pudieron cargar los eventos: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
  
+    /**
+     * Añade una nueva fila vacía a la tabla para crear un nuevo evento.
+     * 
+     * @throws IOException Si ocurre un error de entrada/salida
+     */
     @FXML
     public void addRow() throws IOException {
-        // Creamos un evento vacío
-        Evento filaVacia = new Evento(Evento.getLastId()+1, "", "","","","",0);
- 
-        // Añadimos la fila vacía al ObservableList
-        listaEventos.add(filaVacia);
- 
-        // Seleccionamos la fila recién añadida y hacemos que sea editable
-        tableView.getSelectionModel().select(filaVacia);
-        tableView.edit(tableView.getSelectionModel().getSelectedIndex(), nombre);
+        try {
+            // Crear un evento vacío con un ID preliminar
+            int nuevoId = Evento.getLastId() + 1;
+            Evento nuevoEvento = new Evento(nuevoId, "", "", "", "", "", 0);
+     
+            // Añadir el nuevo evento a la lista
+            listaEventos.add(nuevoEvento);
+     
+            // Seleccionar y hacer editable la nueva fila
+            tableView.getSelectionModel().select(nuevoEvento);
+            tableView.edit(tableView.getSelectionModel().getSelectedIndex(), nombre);
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error", 
+                "No se pudo añadir un nuevo evento: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
      
-    // Guarda un evento en la base de datos
+    /**
+     * Guarda los cambios de un evento en la base de datos.
+     * 
+     * @param evento El evento a guardar
+     */
     public void saveRow(Evento evento) {
-        int result = evento.save();
-        if (result > 0) {
-            showAlert(AlertType.INFORMATION, "Guardado", "Evento guardado correctamente.");
-            loadData();
-        } else {
-            showAlert(AlertType.ERROR, "Error", "No se pudo guardar el evento.");
+        try {
+            // Validar datos básicos
+            if (evento.getNombre() == null || evento.getNombre().trim().isEmpty()) {
+                showAlert(AlertType.WARNING, "Datos incompletos", 
+                    "El nombre del evento no puede estar vacío");
+                return;
+            }
+            
+            // Intentar guardar el evento
+            int result = evento.save();
+            
+            if (result > 0) {
+                showAlert(AlertType.INFORMATION, "Guardado exitoso", 
+                    "Evento guardado correctamente");
+                    
+                // Recargar datos para actualizar IDs y reflejar cambios de la BD
+                loadData();
+            } else {
+                showAlert(AlertType.ERROR, "Error al guardar", 
+                    "No se pudo guardar el evento. Verifique los datos ingresados.");
+            }
+        } catch (Exception e) {
+            showAlert(AlertType.ERROR, "Error al guardar", 
+                "Se produjo un error al guardar el evento: " + e.getMessage());
+            e.printStackTrace();
         }
     }    
  
-    // Elimina un evento de la base de datos y del TableView
+    /**
+     * Elimina el evento seleccionado de la base de datos,
+     * previa confirmación del usuario.
+     */
     @FXML
     public void deleteRow() {
-        // Pedimos confirmación con un Alert antes de continuar
-        Alert a = new Alert(AlertType.CONFIRMATION);
-        a.setTitle("Confirmación");
-        a.setHeaderText("¿Estás seguro de que quieres borrar este evento?");
-        Optional<ButtonType> result = a.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            // Obtenemos el evento seleccionado
-            Evento evento = (Evento) tableView.getSelectionModel().getSelectedItem();
-            int success = evento.delete();
-            
-            if (success > 0) {
-                listaEventos.remove(evento);  // Lo borramos del ObservableList y del TableView
-                showAlert(AlertType.INFORMATION, "Eliminado", "Evento eliminado correctamente.");
-            } else {
-                showAlert(AlertType.ERROR, "Error", "No se pudo eliminar el evento.");
+        try {
+            // Verificar que haya un evento seleccionado
+            Evento evento = tableView.getSelectionModel().getSelectedItem();
+            if (evento == null) {
+                showAlert(AlertType.WARNING, "Selección vacía", 
+                    "Debe seleccionar un evento para eliminar");
+                return;
             }
+            
+            // Pedir confirmación antes de eliminar
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Confirmación");
+            alert.setHeaderText("¿Está seguro de que desea eliminar este evento?");
+            alert.setContentText("Esta acción no se puede deshacer.");
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                // Intentar eliminar el evento
+                int success = evento.delete();
+                
+                if (success > 0) {
+                    // Eliminar de la lista y mostrar confirmación
+                    listaEventos.remove(evento);
+                    showAlert(AlertType.INFORMATION, "Eliminación exitosa", 
+                        "El evento ha sido eliminado correctamente");
+                } else {
+                    showAlert(AlertType.ERROR, "Error al eliminar", 
+                        "No se pudo eliminar el evento. Puede que tenga participantes o artistas asignados.");
+                }
+            }
+        } catch (Exception e) {
+            String mensajeError = e.getMessage();
+            if (mensajeError != null && mensajeError.contains("foreign key constraint")) {
+                showAlert(AlertType.ERROR, "Error al eliminar", 
+                    "Este evento tiene participantes o artistas asociados. Elimine primero esas asignaciones.");
+            } else {
+                showAlert(AlertType.ERROR, "Error al eliminar", 
+                    "Error en la base de datos: " + mensajeError);
+            }
+            e.printStackTrace();
         }
     }
     
     //--------------------------------------------------
-    // MÉTODO AUXILIAR PARA MOSTRAR ALERTAS
+    // MÉTODOS AUXILIARES
     //--------------------------------------------------
+    /**
+     * Muestra un cuadro de diálogo de alerta con el tipo, título y mensaje especificados.
+     * 
+     * @param type El tipo de alerta (ERROR, WARNING, INFORMATION, etc.)
+     * @param title El título del cuadro de diálogo
+     * @param message El mensaje a mostrar
+     */
     private void showAlert(AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        try {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(type);
+                alert.setTitle(title);
+                alert.setHeaderText(null);
+                alert.setContentText(message);
+                alert.showAndWait();
+            });
+        } catch (Exception e) {
+            // Si hay un problema mostrando la alerta, imprimir en consola
+            System.out.println("[ALERTA " + type + "] " + title + ": " + message);
+            e.printStackTrace();
+        }
     }
 }
